@@ -1,0 +1,2 @@
+# Managed by chezmoi.
+export ZDOTDIR="$HOME/.config/zsh"

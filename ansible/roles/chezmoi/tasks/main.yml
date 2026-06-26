@@ -1,0 +1,29 @@
+---
+- name: Check that chezmoi source directory exists
+  ansible.builtin.stat:
+    path: "{{ chezmoi_source_dir }}"
+  register: chezmoi_source
+
+- name: Fail when chezmoi source directory is missing
+  ansible.builtin.fail:
+    msg: "chezmoi source directory does not exist: {{ chezmoi_source_dir }}"
+  when: not chezmoi_source.stat.exists
+
+- name: Preview chezmoi changes
+  become: false
+  ansible.builtin.command:
+    cmd: "chezmoi diff --source {{ chezmoi_source_dir | quote }}"
+  changed_when: false
+  failed_when: false
+  register: chezmoi_diff
+
+- name: Show chezmoi diff
+  ansible.builtin.debug:
+    var: chezmoi_diff.stdout_lines
+  when: chezmoi_diff.stdout | length > 0
+
+- name: Apply chezmoi dotfiles for the current user
+  become: false
+  ansible.builtin.command:
+    cmd: "chezmoi apply --source {{ chezmoi_source_dir | quote }} --verbose"
+  changed_when: true

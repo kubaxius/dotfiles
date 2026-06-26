@@ -1,0 +1,16 @@
+# Managed by chezmoi.
+# This is a minimal placeholder for the future zsh config.
+
+export ZDOTDIR="$HOME/.config/zsh"
+
+if [[ -f "$ZDOTDIR/options.zsh" ]]; then
+  source "$ZDOTDIR/options.zsh"
+fi
+
+if [[ -f "$ZDOTDIR/history.zsh" ]]; then
+  source "$ZDOTDIR/history.zsh"
+fi
+
+if [[ -f "$ZDOTDIR/keybinds.zsh" ]]; then
+  source "$ZDOTDIR/keybinds.zsh"
+fi

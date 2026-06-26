@@ -1,0 +1,9 @@
+---
+repo_dir: "{{ playbook_dir }}/.."
+chezmoi_source_dir: "{{ repo_dir }}/chezmoi"
+
+base_packages:
+  - git
+  - curl
+  - zsh
+  - chezmoi

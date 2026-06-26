@@ -1,0 +1,18 @@
+---
+- name: Install base packages on Arch Linux
+  ansible.builtin.package:
+    name: "{{ base_packages }}"
+    state: present
+  when: ansible_facts.os_family == "Archlinux"
+
+- name: Install base packages on Debian/Ubuntu
+  ansible.builtin.package:
+    name: "{{ base_packages }}"
+    state: present
+  when: ansible_facts.os_family == "Debian"
+
+- name: Install base packages on Fedora/RHEL-like systems
+  ansible.builtin.package:
+    name: "{{ base_packages }}"
+    state: present
+  when: ansible_facts.os_family == "RedHat"

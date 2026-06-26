@@ -1,0 +1,13 @@
+# Local/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ansible
+*.retry
+
+# Local secrets/config overrides
+.env
+*.local
