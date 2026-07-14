@@ -1,0 +1,15 @@
+# Load each modular configuration file from $ZDOTDIR in order.
+for f in \
+  env \
+  options \
+  history \
+  aliases \
+  keybinds \
+  completion \
+  plugins \
+  prompt \
+  scripts
+do
+  # shellcheck disable=SC1090
+  source "$ZDOTDIR/$f.zsh"
+done

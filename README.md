@@ -28,7 +28,7 @@ home directory entries.
 ├── chezmoi/
 │   ├── dot_zshrc
 │   ├── dot_zshenv
-│   └── dot_config/
+│   └── private_dot_config/
 │       └── zsh/
 └── system/
 ```
@@ -51,7 +51,7 @@ chezmoi add ~/.config/nvim
 
 Chezmoi copies the current configuration into the repository. For example,
 `~/.config/nvim/init.lua` becomes
-`chezmoi/dot_config/nvim/init.lua`.
+`chezmoi/private_dot_config/nvim/init.lua`.
 
 Review and commit the imported files:
 
@@ -69,7 +69,7 @@ Do not add secrets such as API tokens or private keys as plain files.
 Edit files under the `chezmoi/` directory, which is the source of truth:
 
 ```bash
-nvim chezmoi/dot_config/nvim/init.lua
+nvim chezmoi/private_dot_config/nvim/init.lua
 ```
 
 Preview and apply the changes to `$HOME`:
