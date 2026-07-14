@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+selection="$(cliphist list | rofi -dmenu -display-columns 2 -p "Clipboard")"
+[ -n "$selection" ] || exit 0
+
+tmp="${TMPDIR:-/tmp}/cliphist-copy.$$"
+trap 'rm -f "$tmp"' EXIT HUP INT TERM
+
+printf '%s\n' "$selection" | cliphist decode > "$tmp"
+mime="$(file --brief --mime-type "$tmp" 2>/dev/null || true)"
+
+case "$mime" in
+	image/*)
+		wl-copy --type "$mime" < "$tmp"
+		;;
+	text/*|application/json|application/xml|application/x-shellscript)
+		wl-copy --type text/plain < "$tmp"
+		;;
+	*)
+		if LC_ALL=C grep -q '[^[:print:][:space:]]' "$tmp"; then
+			wl-copy --type "${mime:-application/octet-stream}" < "$tmp"
+		else
+			wl-copy --type text/plain < "$tmp"
+		fi
+		;;
+esac

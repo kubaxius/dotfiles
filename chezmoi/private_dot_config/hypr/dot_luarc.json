@@ -1,0 +1,8 @@
+{
+  "diagnostics.globals": ["hl"],
+  "workspace.library": ["types"],
+  "runtime.version": "Lua 5.4",
+    "diagnostics.disable": [
+        "redundant-parameter"
+    ]
+}

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+config_dir="$(dirname -- "$script_dir")"
+keybindings_file="${HYPR_SUBMAPS_FILE:-$config_dir/modules/keybindings.lua}"
+
+if [[ ! -r "$keybindings_file" ]]; then
+	notify-send "Hyprland submaps" "Cannot read $keybindings_file" 2>/dev/null || true
+	exit 1
+fi
+
+submaps="$(
+	{
+		printf '%s\n' reset
+		sed -nE "s/^[[:space:]]*defineSubmap[[:space:]]*\\([[:space:]]*[\"']([^\"']+)[\"'].*/\\1/p" "$keybindings_file"
+	} | awk '!seen[$0]++'
+)"
+
+if [[ -z "$submaps" ]]; then
+	notify-send "Hyprland submaps" "No submaps found in $keybindings_file" 2>/dev/null || true
+	exit 1
+fi
+
+submap="$(printf '%s\n' "$submaps" | rofi -dmenu -i -p "Submap" || true)"
+
+if [[ -z "$submap" ]]; then
+	exit 0
+fi
+
+lua_submap="${submap//\\/\\\\}"
+lua_submap="${lua_submap//\"/\\\"}"
+
+if output="$(hyprctl dispatch "hl.dsp.submap(\"$lua_submap\")" 2>&1)"; then
+	if [[ "$submap" == reset ]]; then
+		notify-send "Hyprland submap" "Reset to default keybindings" 2>/dev/null || true
+	else
+		notify-send "Hyprland submap" "Entered $submap" 2>/dev/null || true
+	fi
+else
+	notify-send "Hyprland submap" "Failed to enter $submap: $output" 2>/dev/null || true
+	printf 'Failed to enter submap %s: %s\n' "$submap" "$output" >&2
+	exit 1
+fi
