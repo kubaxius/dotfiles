@@ -1,0 +1,12 @@
+{
+  "VsCodeTaskButtons.tasks": [
+    {
+      "label": "➕ Add to Chezmoi",
+      "task": "Add Files to Chezmoi (System Picker)"
+    },
+    {
+      "label": "➖ Forget from Chezmoi",
+      "task": "Forget Files from Chezmoi (System Picker)"
+    }
+  ]
+}

@@ -13,7 +13,24 @@
       "label": "Add Files to Chezmoi (System Picker)",
       "command": "python",
       "args": [
-        "${workspaceFolder}/tools/vscode_integration/chezmoi-add-portal.py"
+        "${workspaceFolder}/tools/vscode_integration/chezmoi-portal.py",
+        "add"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "type": "process",
+      "label": "Forget Files from Chezmoi (System Picker)",
+      "command": "python",
+      "args": [
+        "${workspaceFolder}/tools/vscode_integration/chezmoi-portal.py",
+        "forget"
       ],
       "problemMatcher": [],
       "presentation": {
