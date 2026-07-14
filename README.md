@@ -1,12 +1,16 @@
-# Dotfiles Workstation Bootstrap Lab
+# Dotfiles Workstation Bootstrap
 
-This is a minimal test repository for building a personal Linux workstation
-bootstrap workflow.
+This repository is the source of truth for the workstation configuration:
 
-The intended architecture is:
+- **Ansible** manages system provisioning: packages, services, and privileged
+  files.
+- **chezmoi** manages user configuration files in `$HOME`.
+- **Git** tracks and synchronizes all changes.
 
-- **Ansible** manages system provisioning: packages, services, privileged files.
-- **chezmoi** manages user dotfiles in `$HOME`.
+The repository is stored in chezmoi's default source directory,
+`~/.local/share/chezmoi`. The `.chezmoiroot` file points chezmoi at the
+`chezmoi/` subdirectory, so files belonging to Ansible are not interpreted as
+home directory entries.
 
 ## Repository layout
 
@@ -29,7 +33,147 @@ The intended architecture is:
 └── system/
 ```
 
-## Quick start
+## Daily chezmoi workflows
+
+### Add an existing application configuration
+
+Add a single file:
+
+```bash
+chezmoi add ~/.config/kitty/kitty.conf
+```
+
+Add an application's entire configuration directory:
+
+```bash
+chezmoi add ~/.config/nvim
+```
+
+Chezmoi copies the current configuration into the repository. For example,
+`~/.config/nvim/init.lua` becomes
+`chezmoi/dot_config/nvim/init.lua`.
+
+Review and commit the imported files:
+
+```bash
+chezmoi managed
+git status
+git add chezmoi
+git commit -m "Add nvim configuration"
+```
+
+Do not add secrets such as API tokens or private keys as plain files.
+
+### Edit repository configuration and apply it
+
+Edit files under the `chezmoi/` directory, which is the source of truth:
+
+```bash
+nvim chezmoi/dot_config/nvim/init.lua
+```
+
+Preview and apply the changes to `$HOME`:
+
+```bash
+chezmoi diff
+chezmoi apply --verbose
+```
+
+To preview without changing anything:
+
+```bash
+chezmoi apply --dry-run --verbose
+```
+
+Changes can also be applied to one target only:
+
+```bash
+chezmoi apply ~/.config/nvim/init.lua
+```
+
+After verifying the result, commit the source file:
+
+```bash
+git add chezmoi
+git commit -m "Update nvim configuration"
+```
+
+### Import changes made by an application or its GUI
+
+Some applications modify their own files, for example when a setting is
+changed through a GUI. First inspect the difference:
+
+```bash
+chezmoi diff ~/.config/example-app
+```
+
+Copy the current files from `$HOME` back into the repository:
+
+```bash
+chezmoi re-add ~/.config/example-app
+```
+
+Then review and commit the result:
+
+```bash
+git diff
+git add chezmoi
+git commit -m "Update example-app settings"
+```
+
+`chezmoi re-add` is only needed for changes made outside the repository. For
+normal manual editing, edit the source under `chezmoi/` and use
+`chezmoi apply`.
+
+### Stop managing an application configuration
+
+To remove a configuration from chezmoi while leaving the active files in
+`$HOME` untouched:
+
+```bash
+chezmoi forget ~/.config/example-app
+```
+
+Review and commit the removal:
+
+```bash
+git status
+git add -A chezmoi
+git commit -m "Stop managing example-app configuration"
+```
+
+If the active configuration should also be deleted from `$HOME`, use
+`chezmoi destroy` instead. Always preview this destructive operation first;
+`--recursive` is required for a directory:
+
+```bash
+chezmoi destroy --recursive --dry-run --verbose ~/.config/example-app
+chezmoi destroy --recursive ~/.config/example-app
+```
+
+## Bootstrap a new machine
+
+The intended setup on a new machine is:
+
+1. Clone this repository into `~/.local/share/chezmoi`.
+2. Run `./bootstrap.sh`.
+3. Let the script install Ansible if necessary.
+4. Let Ansible install packages and perform system configuration.
+5. Let the playbook run `chezmoi apply` for user configuration.
+
+Once the bootstrap roles are implemented, the process should be:
+
+```bash
+git clone <repository-url> ~/.local/share/chezmoi
+cd ~/.local/share/chezmoi
+./bootstrap.sh
+```
+
+Because `bootstrap.sh` can attempt to install Ansible using `pacman`,
+`apt-get`, or `dnf`, a separate manual Ansible installation is usually
+unnecessary.
+
+## Current bootstrap command
 
 Run:
 
@@ -55,9 +199,11 @@ Use this repo inside a fresh VM first:
 4. Run `./bootstrap.sh`.
 5. If something breaks, roll back to the snapshot and retry.
 
-## Safety notes
+## Current status and safety notes
 
-This is intentionally minimal. The current playbook installs only base packages
-and applies placeholder chezmoi dotfiles.
+This repository is still a minimal bootstrap lab. The playbook references the
+`base` and `chezmoi` roles, but those roles are not currently present. As a
+result, the documented one-command bootstrap is the target workflow, not yet a
+working fresh-machine installation.
 
 Do not add destructive system tasks until they have been tested in a VM.
