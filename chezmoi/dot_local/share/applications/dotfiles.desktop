@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Dotfiles
+Comment=Edit dotfiles in VS Code and apply changes automatically
+Exec=/usr/bin/chezmoi edit --watch
+Icon=preferences-desktop
+Terminal=false
+Categories=Development;Utility;
+Keywords=dotfiles;chezmoi;configuration;
+StartupNotify=true
