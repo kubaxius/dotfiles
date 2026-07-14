@@ -80,6 +80,7 @@ function HyprlandLua.permission(path, permission, policy) end
 
 ---@class HyprlandWindowDispatch
 ---@field close fun(): any
+---@field kill fun(): any
 ---@field float fun(options?: table): any
 ---@field pseudo fun(): any
 ---@field move fun(options: table): any

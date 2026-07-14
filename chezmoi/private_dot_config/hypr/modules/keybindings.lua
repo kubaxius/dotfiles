@@ -17,7 +17,7 @@ local function optionalRequire(moduleName)
 end
 
 local regressionPatch = optionalRequire("modules.patches.regression_temp_patch")
-regressionPatch.bindMouseSubmap = regressionPatch.bindMouseSubmap or function() end
+regressionPatch.bindMouseSubmap = regressionPatch.bindMouseSubmap or function(_submap, _keys, _dispatcher, _options) end
 
 local programs = require("modules.programs")
 local terminal = programs.terminal
