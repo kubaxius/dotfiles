@@ -1,0 +1,32 @@
+// Place your key bindings in this file to override the defaults
+[
+  {
+    "key": "ctrl+g",
+    "command": "-workbench.action.gotoLine",
+  },
+  {
+    "key": "ctrl+g",
+    "command": "editor.action.smartSelect.grow",
+  },
+  // =========================
+  // Emmet
+  // =========================
+  {
+    "key": "ctrl+alt+e w",
+    "command": "editor.emmet.action.wrapWithAbbreviation",
+    "when": "editorTextFocus && editorHasSelection && !editorReadonly",
+  },
+  {
+    "key": "ctrl+alt+e r",
+    "command": "editor.emmet.action.removeTag",
+    "when": "editorTextFocus && !editorReadonly",
+  },
+  // =========================
+  // Change Case
+  // =========================
+  {
+    "key": "ctrl+alt+c",
+    "command": "extension.changeCase.commands",
+    "when": "editorTextFocus && editorHasSelection && !editorReadonly",
+  },
+]
