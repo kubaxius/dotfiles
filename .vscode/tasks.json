@@ -9,6 +9,11 @@
       "problemMatcher": []
     },
     {
+      "type": "shell",
+      "label": "Apply Chezmoi file changes",
+      "command": "chezmoi apply"
+    },
+    {
       "type": "process",
       "label": "Add Files to Chezmoi (System Picker)",
       "command": "python",
