@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+active_window="$(hyprctl -j activewindow)"
+
+if [[ -z "$active_window" || "$active_window" == "{}" ]]; then
+	exit 0
+fi
+
+hyprctl dispatch setfloating active
+
+if ! grep -q '"pinned"[[:space:]]*:[[:space:]]*true' <<<"$active_window"; then
+	hyprctl dispatch pin active
+fi
+
+hyprctl dispatch alterzorder top
