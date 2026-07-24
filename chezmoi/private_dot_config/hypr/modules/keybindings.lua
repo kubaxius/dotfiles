@@ -2,20 +2,6 @@
 ---- KEYBINDINGS ----
 ---------------------
 
-local function optionalRequire(moduleName)
-	local ok, module = pcall(require, moduleName)
-
-	if ok then
-		return module
-	end
-
-	if not tostring(module):find("module '" .. moduleName .. "' not found", 1, true) then
-		error(module)
-	end
-
-	return {}
-end
-
 local programs = require("modules.programs")
 local terminal = programs.terminal
 local fileManager = programs.fileManager
