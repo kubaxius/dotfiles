@@ -116,6 +116,8 @@ defineBindBlock("windows", function()
 	hl.bind(modBind("SHIFT + C"), hl.dsp.window.kill())
 	hl.bind(modBind("SHIFT + F"), hl.dsp.window.float({ action = "toggle" }))
 	hl.bind(modBind("F"), hl.dsp.exec_cmd([[hyprctl dispatch 'hl.dsp.window.fullscreen({"fullscreen", "toggle"})']]))
+	-- TODO: Make this work
+	-- hl.bind(modBind("SHIFT + P"), hl.dsp.exec_cmd("~/.config/hypr/scripts/hypr-make-pip"))
 	hl.bind(modBind("P"), hl.dsp.window.pseudo())
 	hl.bind(modBind("J"), hl.dsp.layout("togglesplit")) -- dwindle only
 end)

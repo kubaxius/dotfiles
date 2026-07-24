@@ -62,10 +62,7 @@ hl.window_rule({
 	float = true,
 })
 
--- class: RimWorldLinux
--- title: RimWorld by Ludeon Studios
--- workspace: 2
--- contentType: none
+-- Rimworld fullscreen
 hl.window_rule({
 	name = "rimworld",
 	match = { class = "RimWorldLinux" },
