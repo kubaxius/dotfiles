@@ -16,9 +16,6 @@ local function optionalRequire(moduleName)
 	return {}
 end
 
-local regressionPatch = optionalRequire("modules.patches.regression_temp_patch")
-regressionPatch.bindMouseSubmap = regressionPatch.bindMouseSubmap or function(_submap, _keys, _dispatcher, _options) end
-
 local programs = require("modules.programs")
 local terminal = programs.terminal
 local fileManager = programs.fileManager
@@ -246,12 +243,3 @@ defineSubmap("RimWorld", {
 	end,
 	"rimworld-mouse",
 })
-
--- Temporary mouse/submap regression fallbacks. Remove this block and the optional
--- patch require above when Hyprland handles mouse binds inside submaps normally.
-regressionPatch.bindMouseSubmap(
-	"RimWorld",
-	"mouse:274",
-	hl.dsp.send_shortcut({ mods = "", key = "KP_Subtract" }),
-	{ device = { list = { "naga" } } }
-)
