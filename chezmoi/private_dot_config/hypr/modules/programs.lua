@@ -6,7 +6,8 @@
 local programs = {
 	terminal = "kitty",
 	fileManager = "dolphin",
-	menu = "hyprlauncher",
+	menu_old = "hyprlauncher",
+	menu = [[rofi -show drun -run-command "uwsm app -- {cmd}"]],
 	browser = "firefox",
 	emojis = "rofimoji --selector rofi --action clipboard --clipboarder wl-copy --typer wtype --files emojis",
 }
