@@ -1,0 +1,26 @@
+xkb_keymap {
+	xkb_keycodes { include "evdev+aliases(qwerty)" };
+	xkb_types { include "complete" };
+	xkb_compat { include "complete" };
+	xkb_symbols {
+		include "pc+pl+inet(evdev)"
+
+		replace key <NMLK> { [ NoSymbol ] };
+		modifier_map None { <NMLK> };
+
+		replace key <KP7> { [ KP_7 ] };
+		replace key <KP8> { [ KP_8 ] };
+		replace key <KP9> { [ KP_9 ] };
+
+		replace key <KP4> { [ KP_4 ] };
+		replace key <KP5> { [ KP_5 ] };
+		replace key <KP6> { [ KP_6 ] };
+
+		replace key <KP1> { [ KP_1 ] };
+		replace key <KP2> { [ KP_2 ] };
+		replace key <KP3> { [ KP_3 ] };
+
+		replace key <KP0> { [ KP_0 ] };
+	};
+	xkb_geometry { include "pc(pc105)" };
+};

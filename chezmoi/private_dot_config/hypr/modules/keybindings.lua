@@ -13,6 +13,20 @@ local emojis = programs.emojis
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 local bindMod = mainMod
 
+local function notifySubmap(submap, message)
+	return uwsm.raw(
+		string.format([[notify-send "Hyprland" %q; hyprctl dispatch 'hl.dsp.submap("%s")']], message, submap)
+	)
+end
+
+local function toggleNumpadWorkspaceMode()
+	if hl.get_current_submap() == "numpad-workspaces" then
+		hl.dispatch(notifySubmap("reset", "Numpad number mode"))
+	else
+		hl.dispatch(notifySubmap("numpad-workspaces", "Numpad workspace mode"))
+	end
+end
+
 local function modBind(keys)
 	if bindMod == "" then
 		return keys
@@ -124,6 +138,10 @@ defineBindBlock("numbered-workspaces", function()
 	end
 end)
 
+defineBindBlock("numpad-workspace-mode-toggle", function()
+	hl.bind("code:77", toggleNumpadWorkspaceMode)
+end)
+
 defineBindBlock("special-workspace", function()
 	hl.bind(modBind("S"), hl.dsp.workspace.toggle_special("magic"))
 	hl.bind(modBind("SHIFT + S"), hl.dsp.window.move({ workspace = "special:magic" }))
@@ -169,16 +187,8 @@ defineBindBlock("media", function()
 		uwsm.raw("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
 		{ locked = true, repeating = true }
 	)
-	hl.bind(
-		"XF86MonBrightnessUp",
-		uwsm.raw("brightnessctl -e4 -n2 set 5%+"),
-		{ locked = true, repeating = true }
-	)
-	hl.bind(
-		"XF86MonBrightnessDown",
-		uwsm.raw("brightnessctl -e4 -n2 set 5%-"),
-		{ locked = true, repeating = true }
-	)
+	hl.bind("XF86MonBrightnessUp", uwsm.raw("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
+	hl.bind("XF86MonBrightnessDown", uwsm.raw("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 	hl.bind("XF86AudioNext", uwsm.raw("playerctl next"), { locked = true })
 	hl.bind("XF86AudioPause", uwsm.raw("playerctl play-pause"), { locked = true })
 	hl.bind("XF86AudioPlay", uwsm.raw("playerctl play-pause"), { locked = true })
@@ -214,6 +224,7 @@ local universalBindBlocks = {
 	"windows",
 	"focus",
 	"numbered-workspaces",
+	"numpad-workspace-mode-toggle",
 	"special-workspace",
 	"workspace-scroll",
 	"macro-keys",
@@ -225,6 +236,29 @@ local universalBindBlocks = {
 }
 
 useBindBlocks(universalBindBlocks)
+
+defineSubmap("numpad-workspaces", function()
+	useBindBlocks(universalBindBlocks)
+
+	local keypadWorkspaces = {
+		{ workspace = 1, key = "KP_1" },
+		{ workspace = 2, key = "KP_2" },
+		{ workspace = 3, key = "KP_3" },
+		{ workspace = 4, key = "KP_4" },
+		{ workspace = 5, key = "KP_5" },
+		{ workspace = 6, key = "KP_6" },
+		{ workspace = 7, key = "KP_7" },
+		{ workspace = 8, key = "KP_8" },
+		{ workspace = 9, key = "KP_9" },
+	}
+
+	for _, binding in ipairs(keypadWorkspaces) do
+		hl.bind(binding.key, hl.dsp.focus({ workspace = binding.workspace }))
+		hl.bind("SHIFT + " .. binding.key, hl.dsp.window.move({ workspace = binding.workspace }))
+	end
+
+	hl.bind("escape", notifySubmap("reset", "Numpad number mode"))
+end)
 
 defineSubmap("RimWorld", {
 	function()

@@ -4,8 +4,7 @@
 
 hl.config({
 	input = {
-		kb_layout = "pl",
-		numlock_by_default = true,
+		kb_file = "~/.config/hypr/xkb/pl-no-numlock.xkb",
 
 		follow_mouse = 1,
 

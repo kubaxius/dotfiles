@@ -181,6 +181,8 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@field kb_model? string
 ---@field kb_options? string
 ---@field kb_rules? string
+---@field kb_file? string
+---@field numlock_by_default? boolean
 ---@field follow_mouse? integer
 ---@field sensitivity? number
 ---@field touchpad? HyprlandTouchpadConfig
@@ -242,6 +244,7 @@ function HyprlandLua.permission(path, permission, policy) end
 
 ---@class HyprlandWorkspaceRule
 ---@field workspace string
+---@field persistent? boolean
 ---@field gaps_out? integer
 ---@field gaps_in? integer
 

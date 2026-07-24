@@ -7,6 +7,13 @@
 
 -- Example window rules that are useful
 
+for i = 1, 9 do
+	hl.workspace_rule({
+		workspace = tostring(i),
+		persistent = true,
+	})
+end
+
 local suppressMaximizeRule = hl.window_rule({
 	-- Ignore maximize requests from all apps. You'll probably like this.
 	name = "suppress-maximize-events",
