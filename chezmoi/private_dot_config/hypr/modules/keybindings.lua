@@ -3,6 +3,7 @@
 ---------------------
 
 local programs = require("modules.programs")
+local uwsm = require("modules.uwsm")
 local terminal = programs.terminal
 local fileManager = programs.fileManager
 local menu = programs.menu
@@ -78,7 +79,7 @@ end
 -- Universal bind to choose or reset submaps from anywhere.
 hl.bind(
 	mainMod .. " + SHIFT + escape",
-	hl.dsp.exec_cmd("~/.config/hypr/scripts/hypr-submap-menu"),
+	uwsm.raw("~/.config/hypr/scripts/hypr-submap-menu"),
 	{ submap_universal = true }
 )
 
@@ -87,23 +88,20 @@ hl.bind(
 ---------------------------
 
 defineBindBlock("launchers", function()
-	hl.bind(modBind("Q"), hl.dsp.exec_cmd(terminal))
-	hl.bind(
-		modBind("M"),
-		hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'")
-	)
-	hl.bind(modBind("E"), hl.dsp.exec_cmd(fileManager))
-	hl.bind(modBind("R"), hl.dsp.exec_cmd(menu))
-	hl.bind(modBind("period"), hl.dsp.exec_cmd(emojis))
+	hl.bind(modBind("Q"), uwsm.exec(terminal))
+	hl.bind(modBind("M"), uwsm.stop())
+	hl.bind(modBind("E"), uwsm.exec(fileManager))
+	hl.bind(modBind("R"), uwsm.exec(menu))
+	hl.bind(modBind("period"), uwsm.exec(emojis))
 end)
 
 defineBindBlock("windows", function()
 	hl.bind(modBind("C"), hl.dsp.window.close())
 	hl.bind(modBind("SHIFT + C"), hl.dsp.window.kill())
 	hl.bind(modBind("SHIFT + F"), hl.dsp.window.float({ action = "toggle" }))
-	hl.bind(modBind("F"), hl.dsp.exec_cmd([[hyprctl dispatch 'hl.dsp.window.fullscreen({"fullscreen", "toggle"})']]))
+	hl.bind(modBind("F"), uwsm.raw([[hyprctl dispatch 'hl.dsp.window.fullscreen({"fullscreen", "toggle"})']]))
 	-- TODO: Make this work
-	-- hl.bind(modBind("SHIFT + P"), hl.dsp.exec_cmd("~/.config/hypr/scripts/hypr-make-pip"))
+	-- hl.bind(modBind("SHIFT + P"), uwsm.raw("~/.config/hypr/scripts/hypr-make-pip"))
 	hl.bind(modBind("P"), hl.dsp.window.pseudo())
 	hl.bind(modBind("J"), hl.dsp.layout("togglesplit")) -- dwindle only
 end)
@@ -136,10 +134,10 @@ defineBindBlock("workspace-scroll", function()
 end)
 
 defineBindBlock("macro-keys", function()
-	hl.bind("XF86Tools", hl.dsp.exec_cmd("~/.config/hypr/scripts/hypr-submap-menu"))
-	hl.bind("XF86Launch7", hl.dsp.exec_cmd(fileManager))
-	hl.bind("XF86Launch8", hl.dsp.exec_cmd(terminal))
-	hl.bind("XF86Launch9", hl.dsp.exec_cmd(menu))
+	hl.bind("XF86Tools", uwsm.raw("~/.config/hypr/scripts/hypr-submap-menu"))
+	hl.bind("XF86Launch7", uwsm.exec(fileManager))
+	hl.bind("XF86Launch8", uwsm.exec(terminal))
+	hl.bind("XF86Launch9", uwsm.exec(menu))
 end)
 
 defineBindBlock("mouse-controls", function()
@@ -150,51 +148,51 @@ end)
 defineBindBlock("media", function()
 	hl.bind(
 		"XF86AudioRaiseVolume",
-		hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
+		uwsm.raw("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
 		{ locked = true, repeating = true }
 	)
 	hl.bind(
 		"XF86AudioLowerVolume",
-		hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
+		uwsm.raw("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
 		{ locked = true, repeating = true }
 	)
 	hl.bind(
 		"XF86AudioMute",
-		hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
+		uwsm.raw("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
 		{ locked = true, repeating = true }
 	)
 	hl.bind(
 		"XF86AudioMicMute",
-		hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
+		uwsm.raw("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
 		{ locked = true, repeating = true }
 	)
 	hl.bind(
 		"XF86MonBrightnessUp",
-		hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),
+		uwsm.raw("brightnessctl -e4 -n2 set 5%+"),
 		{ locked = true, repeating = true }
 	)
 	hl.bind(
 		"XF86MonBrightnessDown",
-		hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),
+		uwsm.raw("brightnessctl -e4 -n2 set 5%-"),
 		{ locked = true, repeating = true }
 	)
-	hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
-	hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-	hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-	hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+	hl.bind("XF86AudioNext", uwsm.raw("playerctl next"), { locked = true })
+	hl.bind("XF86AudioPause", uwsm.raw("playerctl play-pause"), { locked = true })
+	hl.bind("XF86AudioPlay", uwsm.raw("playerctl play-pause"), { locked = true })
+	hl.bind("XF86AudioPrev", uwsm.raw("playerctl previous"), { locked = true })
 end)
 
 defineBindBlock("screenshots", function()
-	hl.bind("print", hl.dsp.exec_cmd("hyprshot -m region --raw | satty --filename -"), { locked = true })
-	hl.bind("SHIFT + print", hl.dsp.exec_cmd("hyprshot -m window"))
+	hl.bind("print", uwsm.raw("hyprshot -m region --raw | satty --filename -"), { locked = true })
+	hl.bind("SHIFT + print", uwsm.raw("hyprshot -m window"))
 end)
 
 defineBindBlock("hypr-tools", function()
-	hl.bind(modBind("SHIFT + I"), hl.dsp.exec_cmd("hypr-copy-active-window-info"))
+	hl.bind(modBind("SHIFT + I"), uwsm.raw("hypr-copy-active-window-info"))
 end)
 
 defineBindBlock("clipboard", function()
-	hl.bind(modBind("V"), hl.dsp.exec_cmd("~/.config/hypr/scripts/cliphist-copy"))
+	hl.bind(modBind("V"), uwsm.raw("~/.config/hypr/scripts/cliphist-copy"))
 end)
 defineBindBlock("rimworld-mouse", function()
 	hl.bind("1", hl.dsp.send_shortcut({ mods = "", key = "F1" }), { device = { list = { "naga" } } })

@@ -13,6 +13,14 @@ Hypridle screen-off wake issues, Waybar crashes, and UWSM startup behavior.
 - Keep Hypridle turning the screen off after 10 minutes.
 - Avoid UWSM/systemd launching the whole XDG autostart batch from Plasma/KDE.
 
+## Launch Policy
+
+- Apps and long-lived daemons started by Hyprland config go through
+  `modules.uwsm.app`, `modules.uwsm.exec`, or `modules.uwsm.start`.
+- Session shutdown uses `modules.uwsm.stop()` / `uwsm stop`.
+- Only compositor controls and one-shot system controls use raw commands via
+  `modules.uwsm.raw` or `modules.uwsm.start_raw`.
+
 ## Local Config Changes
 
 `modules/autostart.lua`
@@ -22,7 +30,7 @@ Hypridle screen-off wake issues, Waybar crashes, and UWSM startup behavior.
 - Added a fallback for non-UWSM Hyprland sessions:
 
 ```lua
-hl.exec_cmd([[test "$DESKTOP_SESSION" = hyprland-uwsm || (waybar & hyprpaper)]])
+uwsm.start_raw([[test "$DESKTOP_SESSION" = hyprland-uwsm || (waybar & hyprpaper)]])
 ```
 
 This prevents duplicate Waybar under UWSM, while still giving a bar if the
