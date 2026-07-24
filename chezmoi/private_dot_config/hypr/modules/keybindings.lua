@@ -97,6 +97,9 @@ end)
 
 defineBindBlock("windows", function()
 	hl.bind(modBind("C"), hl.dsp.window.close())
+	-- TODO: Replace this with a UWSM-aware stop-active-window helper:
+	-- resolve the active window PID to its systemd user unit, stop that unit,
+	-- and only fall back to Hyprland kill when no UWSM unit can be found.
 	hl.bind(modBind("SHIFT + C"), hl.dsp.window.kill())
 	hl.bind(modBind("SHIFT + F"), hl.dsp.window.float({ action = "toggle" }))
 	hl.bind(modBind("F"), uwsm.raw([[hyprctl dispatch 'hl.dsp.window.fullscreen({"fullscreen", "toggle"})']]))

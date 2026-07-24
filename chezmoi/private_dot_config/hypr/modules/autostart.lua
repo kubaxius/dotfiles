@@ -19,16 +19,19 @@ hl.on("hyprland.start", function()
 	uwsm.start_raw("systemctl --user reset-failed hyprpolkitagent")
 	uwsm.start_raw("systemctl --user restart hyprpolkitagent")
 
-	uwsm.start("dunst")
+	uwsm.start("dunst", "dunst")
 
-	uwsm.start("nm-applet")
-	uwsm.start("xsettingsd")
+	uwsm.start("nm-applet", "nm-applet")
+	uwsm.start("xsettingsd", "xsettingsd")
 	uwsm.start_raw([[test "$DESKTOP_SESSION" = hyprland-uwsm || (waybar & hyprpaper)]])
 
-	uwsm.start("ckb-next -b")
+	uwsm.start("ckb-next -b", "ckb-next")
 
-	uwsm.start("wl-paste --type text --watch cliphist store")
-	uwsm.start("wl-paste --type image --watch cliphist store")
-	uwsm.start([[sh -lc 'command -v wl-clip-persist >/dev/null 2>&1 && exec wl-clip-persist --clipboard regular']])
-	--uwsm.start("firefox")
+	uwsm.start("wl-paste --type text --watch cliphist store", "wl-paste-text")
+	uwsm.start("wl-paste --type image --watch cliphist store", "wl-paste-image")
+	uwsm.start(
+		[[sh -lc 'command -v wl-clip-persist >/dev/null 2>&1 && exec wl-clip-persist --clipboard regular']],
+		"wl-clip-persist"
+	)
+	--uwsm.start("firefox", "firefox")
 end)

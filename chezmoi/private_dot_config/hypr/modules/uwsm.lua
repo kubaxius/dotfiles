@@ -8,20 +8,38 @@
 
 local uwsm = {}
 
-function uwsm.app(command)
-	return "if command -v uwsm-app >/dev/null 2>&1; then uwsm-app -- "
+local function unit_option(unit_name)
+	if not unit_name or unit_name == "" then
+		return ""
+	end
+
+	if unit_name:find("[^%w_.@:-]") then
+		error("Invalid UWSM unit name suffix: " .. unit_name)
+	end
+
+	return " -u hyprland-" .. unit_name .. ".scope"
+end
+
+function uwsm.app(command, unit_name)
+	local unit = unit_option(unit_name)
+
+	return "if command -v uwsm-app >/dev/null 2>&1; then uwsm-app"
+		.. unit
+		.. " -- "
 		.. command
-		.. "; else uwsm app -- "
+		.. "; else uwsm app"
+		.. unit
+		.. " -- "
 		.. command
 		.. "; fi"
 end
 
-function uwsm.exec(command)
-	return hl.dsp.exec_cmd(uwsm.app(command))
+function uwsm.exec(command, unit_name)
+	return hl.dsp.exec_cmd(uwsm.app(command, unit_name))
 end
 
-function uwsm.start(command)
-	hl.exec_cmd(uwsm.app(command))
+function uwsm.start(command, unit_name)
+	hl.exec_cmd(uwsm.app(command, unit_name))
 end
 
 function uwsm.raw(command)

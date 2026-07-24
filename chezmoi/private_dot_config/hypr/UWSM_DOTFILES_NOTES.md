@@ -17,6 +17,9 @@ Hypridle screen-off wake issues, Waybar crashes, and UWSM startup behavior.
 
 - Apps and long-lived daemons started by Hyprland config go through
   `modules.uwsm.app`, `modules.uwsm.exec`, or `modules.uwsm.start`.
+- Pass an optional unit suffix when a stable UWSM unit name is useful:
+  `uwsm.exec("firefox", "firefox")` launches
+  `uwsm-app -u hyprland-firefox.scope -- firefox`.
 - Session shutdown uses `modules.uwsm.stop()` / `uwsm stop`.
 - Only compositor controls and one-shot system controls use raw commands via
   `modules.uwsm.raw` or `modules.uwsm.start_raw`.
