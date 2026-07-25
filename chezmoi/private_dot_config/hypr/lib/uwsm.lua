@@ -23,11 +23,11 @@ end
 function M.app(command, unit_name)
 	local unit = unit_option(unit_name)
 
-	return "if command -v uwsm-app >/dev/null 2>&1; then uwsm-app"
+	return "if command -v uwsm-app >/dev/null 2>&1; then exec uwsm-app -t scope"
 		.. unit
 		.. " -- "
 		.. command
-		.. "; else uwsm app"
+		.. "; else exec uwsm app -t scope"
 		.. unit
 		.. " -- "
 		.. command
@@ -40,6 +40,13 @@ end
 
 function M.start(command, unit_name)
 	hl.exec_cmd(M.app(command, unit_name))
+end
+
+-- Starts an application in a UWSM scope with Hyprland one-shot window rules.
+-- Scope mode preserves the launch process chain Hyprland uses to associate the
+-- first window with these rules.
+function M.start_with_rules(command, unit_name, rules)
+	hl.exec_cmd(M.app(command, unit_name), rules)
 end
 
 function M.raw(command)
