@@ -7,13 +7,9 @@ local uwsm = require("lib.uwsm")
 local keys = require("lib.keys")
 local notify = require("lib.notify")
 local submaps = require("lib.submaps")
+-- clear any stale config of the bind-blocks
 package.loaded["lib.bind-blocks"] = nil
 local bindBlocks = require("lib.bind-blocks")
-local terminal = programs.terminal
-local fileManager = programs.fileManager
-local menu = programs.menu
-local browser = programs.browser
-local emojis = programs.emojis
 
 local bind = bindBlocks.bind
 local defineBindBlock = bindBlocks.defineBindBlock
@@ -37,11 +33,11 @@ bind(mainMod .. " + SHIFT + escape", uwsm.raw("~/.config/hypr/scripts/hypr-subma
 ---------------------------
 
 defineBindBlock("launchers", function()
-	bind(modBind("Q"), uwsm.exec(terminal))
+	bind(modBind("Q"), uwsm.exec(programs.terminal))
 	bind(modBind("M"), uwsm.stop())
-	bind(modBind("E"), uwsm.exec(fileManager))
-	bind(modBind("R"), uwsm.exec(menu))
-	bind(modBind("period"), uwsm.exec(emojis))
+	bind(modBind("E"), uwsm.exec(programs.fileManager))
+	bind(modBind("R"), uwsm.exec(programs.menu))
+	bind(modBind("period"), uwsm.exec(programs.emojis))
 end)
 
 defineBindBlock("windows", function()
@@ -87,9 +83,9 @@ end)
 
 defineBindBlock("macro-keys", function()
 	bind("XF86Tools", uwsm.raw("~/.config/hypr/scripts/hypr-submap-menu"))
-	bind("XF86Launch7", uwsm.exec(fileManager))
-	bind("XF86Launch8", uwsm.exec(terminal))
-	bind("XF86Launch9", uwsm.exec(menu))
+	bind("XF86Launch7", uwsm.exec(programs.fileManager))
+	bind("XF86Launch8", uwsm.exec(programs.terminal))
+	bind("XF86Launch9", uwsm.exec(programs.menu))
 end)
 
 defineBindBlock("mouse-controls", function()
@@ -163,8 +159,6 @@ defineBindBlock("numpad-workspaces", function()
 		bind(binding.key, hl.dsp.focus({ workspace = binding.workspace }))
 		bind("SHIFT + " .. binding.key, hl.dsp.window.move({ workspace = binding.workspace }))
 	end
-
-	bind("escape", bindBlocks.disableBlockDispatcher("numpad-workspaces"))
 end, {
 	bind = "code:77",
 	on_enable = function()
@@ -173,6 +167,7 @@ end, {
 	on_disable = function()
 		notify.hyprland("Numpad number mode")
 	end,
+	enabled = true,
 })
 
 local universalBindBlocks = {
