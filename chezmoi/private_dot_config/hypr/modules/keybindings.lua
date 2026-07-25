@@ -51,7 +51,8 @@ defineBindBlock("windows", function()
 	-- TODO: Make this work
 	-- bind(modBind("SHIFT + P"), uwsm.raw("~/.config/hypr/scripts/hypr-make-pip"))
 	bind(modBind("P"), hl.dsp.window.pseudo())
-	bind(modBind("J"), hl.dsp.layout("togglesplit")) -- dwindle only
+	bind(modBind("S"), hl.dsp.layout("swapwithmaster child ignoremaster")) -- master layout only
+	bind(modBind("J"), hl.dsp.layout("togglesplit")) -- dwindle layout only
 end)
 
 defineBindBlock("focus", function()
@@ -70,7 +71,7 @@ defineBindBlock("numbered-workspaces", function()
 end)
 
 defineBindBlock("special-workspace", function()
-	bind(modBind("S"), hl.dsp.workspace.toggle_special("magic"))
+	--bind(modBind("S"), hl.dsp.workspace.toggle_special("magic"))
 	bind(modBind("SHIFT + S"), hl.dsp.window.move({ workspace = "special:magic" }))
 end)
 
