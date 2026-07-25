@@ -232,6 +232,7 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@field match table
 ---@field suppress_event? string
 ---@field no_focus? boolean
+---@field workspace? string
 ---@field move? string
 ---@field float? boolean
 ---@field border_size? integer
