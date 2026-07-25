@@ -1,72 +1,128 @@
-------------------
+--------------------
 ---- WORKSPACES ----
-------------------
+--------------------
 
 local programs = require("modules.programs")
+local uwsm = require("lib.uwsm")
 
 local M = {}
 
 -- See https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
 
--- Workspace 1
+---------------------
+---- WORKSPACE 1 ----
+---------------------
 hl.workspace_rule({
 	workspace = "1",
 	persistent = true,
 })
+local function setup_workspace_1()
+	-- Programs to launch
+end
 
--- Workspace 2
+---------------------
+---- WORKSPACE 2 ----
+---------------------
 hl.workspace_rule({
 	workspace = "2",
 	persistent = true,
 })
+local function setup_workspace_2()
+	-- Programs to launch
+end
 
--- Workspace 3
+---------------------
+---- WORKSPACE 3 ----
+---------------------
 hl.workspace_rule({
 	workspace = "3",
 	persistent = true,
 })
+local function setup_workspace_3()
+	-- Programs to launch
+end
 
--- Workspace 4
+---------------------
+---- WORKSPACE 4 ----
+---------------------
 hl.workspace_rule({
 	workspace = "4",
 	persistent = true,
 })
+local function setup_workspace_4()
+	-- Programs to launch
+end
 
--- Workspace 5: Firefox
+---------------------
+---- WORKSPACE 5 ----
+---------------------
 hl.workspace_rule({
 	workspace = "5",
 	persistent = true,
+	default = true,
 })
+local function setup_workspace_5()
+	-- Make default
+	hl.dispatch(hl.dsp.focus({ workspace = 5 }))
+	-- Programs to launch
+	uwsm.start_with_rules(programs.browser, "firefox", { workspace = "5 silent" })
+end
 
--- Workspace 6
+---------------------
+---- WORKSPACE 6 ----
+---------------------
 hl.workspace_rule({
 	workspace = "6",
 	persistent = true,
 })
+local function setup_workspace_6()
+	-- Programs to launch
+end
 
--- Workspace 7
+---------------------
+---- WORKSPACE 7 ----
+---------------------
 hl.workspace_rule({
 	workspace = "7",
 	persistent = true,
 })
+local function setup_workspace_7()
+	-- Programs to launch
+end
 
--- Workspace 8: Obsidian
+---------------------
+---- WORKSPACE 8 ----
+---------------------
 hl.workspace_rule({
 	workspace = "8",
 	persistent = true,
 })
+local function setup_workspace_8()
+	-- Programs to launch
+	uwsm.start_with_rules(programs.obsidian, "obsidian", { workspace = "8 silent" })
+end
 
--- Workspace 9
+---------------------
+---- WORKSPACE 9 ----
+---------------------
 hl.workspace_rule({
 	workspace = "9",
 	persistent = true,
 })
+local function setup_workspace_9()
+	-- Programs to launch
+end
 
 function M.setup_workspaces()
-	-- Hyprland one-shot rules need to track the real app process.
-	-- Launch these directly so the startup-only workspace placement applies.
-	hl.exec_cmd(programs.browser, { workspace = "5 silent" })
-	hl.exec_cmd(programs.obsidian, { workspace = "8 silent" })
+	setup_workspace_1()
+	setup_workspace_2()
+	setup_workspace_3()
+	setup_workspace_4()
+	setup_workspace_5()
+	setup_workspace_6()
+	setup_workspace_7()
+	setup_workspace_8()
+	setup_workspace_9()
 end
 
 return M
