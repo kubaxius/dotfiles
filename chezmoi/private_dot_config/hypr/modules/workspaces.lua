@@ -3,7 +3,8 @@
 ------------------
 
 local programs = require("modules.programs")
-local uwsm = require("lib.uwsm")
+
+local M = {}
 
 -- See https://wiki.hypr.land/Configuring/Basics/Workspace-Rules/
 
@@ -37,13 +38,6 @@ hl.workspace_rule({
 	persistent = true,
 })
 
-hl.window_rule({
-	name = "firefox-workspace",
-	match = { class = "firefox" },
-
-	workspace = "5",
-})
-
 -- Workspace 6
 hl.workspace_rule({
 	workspace = "6",
@@ -62,20 +56,17 @@ hl.workspace_rule({
 	persistent = true,
 })
 
-hl.window_rule({
-	name = "obsidian-workspace",
-	match = { class = "[Oo]bsidian" },
-
-	workspace = "8",
-})
-
 -- Workspace 9
 hl.workspace_rule({
 	workspace = "9",
 	persistent = true,
 })
 
-hl.on("hyprland.start", function()
-	uwsm.start(programs.browser, "firefox")
-	uwsm.start("obsidian", "obsidian")
-end)
+function M.setup_workspaces()
+	-- Hyprland one-shot rules need to track the real app process.
+	-- Launch these directly so the startup-only workspace placement applies.
+	hl.exec_cmd(programs.browser, { workspace = "5 silent" })
+	hl.exec_cmd(programs.obsidian, { workspace = "8 silent" })
+end
+
+return M

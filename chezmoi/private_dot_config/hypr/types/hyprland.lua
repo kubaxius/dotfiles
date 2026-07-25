@@ -21,7 +21,8 @@ function HyprlandLua.get_current_submap() end
 function HyprlandLua.env(key, value) end
 
 ---@param command string
-function HyprlandLua.exec_cmd(command) end
+---@param rules? table
+function HyprlandLua.exec_cmd(command, rules) end
 
 ---@param dispatcher any
 function HyprlandLua.dispatch(dispatcher) end
@@ -72,7 +73,7 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@class HyprlandDispatch
 ---@field window HyprlandWindowDispatch
 ---@field workspace HyprlandWorkspaceDispatch
----@field exec_cmd fun(command: string): any
+---@field exec_cmd fun(command: string, rules?: table): any
 ---@field focus fun(options: table): any
 ---@field layout fun(layout: string): any
 ---@field send_shortcut fun(options: HyprlandSendShortcutOptions): any

@@ -3,6 +3,7 @@
 -------------------
 
 local uwsm = require("lib.uwsm")
+local workspaces = require("modules.workspaces")
 
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
 
@@ -33,5 +34,5 @@ hl.on("hyprland.start", function()
 		[[sh -lc 'command -v wl-clip-persist >/dev/null 2>&1 && exec wl-clip-persist --clipboard regular']],
 		"wl-clip-persist"
 	)
-	--uwsm.start("firefox", "firefox")
+	workspaces.setup_workspaces()
 end)
