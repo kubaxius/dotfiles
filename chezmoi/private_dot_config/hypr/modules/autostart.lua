@@ -2,7 +2,7 @@
 ---- AUTOSTART ----
 -------------------
 
-local uwsm = require("modules.uwsm")
+local uwsm = require("lib.uwsm")
 
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
 

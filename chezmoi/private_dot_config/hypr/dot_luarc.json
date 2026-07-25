@@ -1,6 +1,6 @@
 {
   "diagnostics.globals": ["hl"],
-  "workspace.library": ["types"],
+  "workspace.library": ["types", "lib", "vendor"],
   "runtime.version": "Lua 5.4",
     "diagnostics.disable": [
         "redundant-parameter"
