@@ -62,7 +62,9 @@ Toggle spec:
 local bindBlocks = {}
 local activeCapture = nil
 
-local bindBlockManager = {}
+-- Lua modules commonly return a table named M. The name is conventional only:
+-- it marks the public module API exported at the bottom of this file.
+local M = {}
 
 local function blockCommand(action, name)
 	return hl.dsp.exec_cmd(string.format([[hyprctl dispatch 'require("lib.bind-blocks").%s(%q)']], action, name))
@@ -118,7 +120,7 @@ local function setBlockEnabled(name, enabled, notify)
 	end
 end
 
-function bindBlockManager.bind(bind, dispatcher, options)
+function M.bind(bind, dispatcher, options)
 	local handle = hl.bind(bind, dispatcher, options)
 
 	if activeCapture then
@@ -128,7 +130,7 @@ function bindBlockManager.bind(bind, dispatcher, options)
 	return handle
 end
 
-function bindBlockManager.defineBindBlock(name, callback, toggleSpec)
+function M.defineBindBlock(name, callback, toggleSpec)
 	if bindBlocks[name] then
 		error("Bind block already defined: " .. name)
 	end
@@ -157,22 +159,22 @@ function bindBlockManager.defineBindBlock(name, callback, toggleSpec)
 	end
 
 	setHandlesEnabled(block, toggle.enabled == true)
-	bindBlockManager.bind(toggle.bind, blockCommand("toggleBlock", name), toggle.options or { submap_universal = true })
+	M.bind(toggle.bind, blockCommand("toggleBlock", name), toggle.options or { submap_universal = true })
 end
 
-function bindBlockManager.enableBlockDispatcher(name)
+function M.enableBlockDispatcher(name)
 	return blockCommand("enableBlock", name)
 end
 
-function bindBlockManager.disableBlockDispatcher(name)
+function M.disableBlockDispatcher(name)
 	return blockCommand("disableBlock", name)
 end
 
-function bindBlockManager.toggleBlockDispatcher(name)
+function M.toggleBlockDispatcher(name)
 	return blockCommand("toggleBlock", name)
 end
 
-function bindBlockManager.useBindBlock(name)
+function M.useBindBlock(name)
 	local block = bindBlocks[name]
 
 	if not block then
@@ -186,25 +188,25 @@ function bindBlockManager.useBindBlock(name)
 	block.callback()
 end
 
-function bindBlockManager.useBindBlocks(blocks)
+function M.useBindBlocks(blocks)
 	for _, block in ipairs(blocks or {}) do
 		if type(block) == "function" then
 			block()
 		else
-			bindBlockManager.useBindBlock(block)
+			M.useBindBlock(block)
 		end
 	end
 end
 
-function bindBlockManager.enableBlock(name)
+function M.enableBlock(name)
 	setBlockEnabled(name, true, true)
 end
 
-function bindBlockManager.disableBlock(name)
+function M.disableBlock(name)
 	setBlockEnabled(name, false, true)
 end
 
-function bindBlockManager.toggleBlock(name)
+function M.toggleBlock(name)
 	local block = bindBlocks[name]
 
 	if not block then
@@ -214,7 +216,7 @@ function bindBlockManager.toggleBlock(name)
 	setBlockEnabled(name, not block.enabled, true)
 end
 
-function bindBlockManager.isBlockEnabled(name)
+function M.isBlockEnabled(name)
 	local block = bindBlocks[name]
 
 	if not block then
@@ -224,4 +226,4 @@ function bindBlockManager.isBlockEnabled(name)
 	return block.enabled == true
 end
 
-return bindBlockManager
+return M

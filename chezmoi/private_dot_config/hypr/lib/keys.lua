@@ -2,9 +2,9 @@
 ---- KEYS ----
 --------------
 
-local keys = {}
+local M = {}
 
-function keys.withMod(mod, key)
+function M.withMod(mod, key)
 	if mod == "" then
 		return key
 	end
@@ -12,4 +12,4 @@ function keys.withMod(mod, key)
 	return mod .. " + " .. key
 end
 
-return keys
+return M

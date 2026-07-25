@@ -2,14 +2,14 @@
 ---- NOTIFY ----
 ------------------
 
-local notify = {}
+local M = {}
 
-function notify.send(title, message)
+function M.send(title, message)
 	return hl.dispatch(hl.dsp.exec_cmd(string.format([[notify-send %q %q]], title, message)))
 end
 
-function notify.hyprland(message)
-	return notify.send("Hyprland", message)
+function M.hyprland(message)
+	return M.send("Hyprland", message)
 end
 
-return notify
+return M

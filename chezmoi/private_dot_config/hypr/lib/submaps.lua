@@ -2,9 +2,9 @@
 ---- SUBMAPS ----
 ----------------
 
-local submaps = {}
+local M = {}
 
-function submaps.define(name, blocks, resetTo, callback, useBindBlocks)
+function M.define(name, blocks, resetTo, callback, useBindBlocks)
 	if type(blocks) == "function" then
 		callback = blocks
 		blocks = {}
@@ -32,4 +32,4 @@ function submaps.define(name, blocks, resetTo, callback, useBindBlocks)
 	return hl.define_submap(name, defineBinds)
 end
 
-return submaps
+return M

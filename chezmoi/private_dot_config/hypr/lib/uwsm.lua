@@ -6,7 +6,7 @@
 -- Keep all app/session launch policy here so future binds and autostarts
 -- make the UWSM choice by default.
 
-local uwsm = {}
+local M = {}
 
 local function unit_option(unit_name)
 	if not unit_name or unit_name == "" then
@@ -20,7 +20,7 @@ local function unit_option(unit_name)
 	return " -u hyprland-" .. unit_name .. ".scope"
 end
 
-function uwsm.app(command, unit_name)
+function M.app(command, unit_name)
 	local unit = unit_option(unit_name)
 
 	return "if command -v uwsm-app >/dev/null 2>&1; then uwsm-app"
@@ -34,24 +34,24 @@ function uwsm.app(command, unit_name)
 		.. "; fi"
 end
 
-function uwsm.exec(command, unit_name)
-	return hl.dsp.exec_cmd(uwsm.app(command, unit_name))
+function M.exec(command, unit_name)
+	return hl.dsp.exec_cmd(M.app(command, unit_name))
 end
 
-function uwsm.start(command, unit_name)
-	hl.exec_cmd(uwsm.app(command, unit_name))
+function M.start(command, unit_name)
+	hl.exec_cmd(M.app(command, unit_name))
 end
 
-function uwsm.raw(command)
+function M.raw(command)
 	return hl.dsp.exec_cmd(command)
 end
 
-function uwsm.start_raw(command)
+function M.start_raw(command)
 	hl.exec_cmd(command)
 end
 
-function uwsm.stop()
+function M.stop()
 	return hl.dsp.exec_cmd("uwsm stop")
 end
 
-return uwsm
+return M
