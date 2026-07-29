@@ -25,7 +25,8 @@ if [[ -n "${LS_COLORS:-}" ]]; then
 fi
 
 # Keep the compinstall metadata pointing to the main zsh startup file.
-zstyle :compinstall filename "$HOME/.zshrc"
+# If you ever wanted to regenerate these settings.
+zstyle :compinstall filename "$ZDOTDIR/.zshrc"
 
 # Load user-provided completion functions before compinit builds its dump.
 # `$fpath` is where zsh looks for autoloadable functions, including custom
