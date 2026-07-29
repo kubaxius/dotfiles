@@ -215,8 +215,13 @@
   },
   "chat.viewSessions.orientation": "stacked",
   "go.toolsManagement.autoUpdate": true,
-  "window.newWindowProfile": "Default",
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "lmstudio:lmstudio",
   "github.copilot.nextEditSuggestions.eagerness": "low",
+  "window.newWindowProfile": "Default",
+{{- if eq .profile "dotfiles" }}
+  "workbench.colorTheme": "Solarized Dark",
+{{- end }}
   "github.copilot.enable": {
     "*": false,
     "plaintext": false,
