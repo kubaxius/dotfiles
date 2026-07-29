@@ -1,8 +1,8 @@
 ---
 - name: Bootstrap local workstation
   hosts: localhost
-  become: true
 
   roles:
     - role: base
+    - role: hyprland
     - role: chezmoi

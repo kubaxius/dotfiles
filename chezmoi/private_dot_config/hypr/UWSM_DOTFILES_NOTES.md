@@ -13,6 +13,28 @@ Hypridle screen-off wake issues, Waybar crashes, and UWSM startup behavior.
 - Keep Hypridle turning the screen off after 10 minutes.
 - Avoid UWSM/systemd launching the whole XDG autostart batch from Plasma/KDE.
 
+## Service Inventory
+
+The canonical list of persistent systemd user units is
+`ansible/host_vars/localhost.yml` under `hyprland_user_services`. Each entry
+records the unit's origin (`package` or `dotfiles-override`) and whether this
+machine enables it. Keep transient processes started by `uwsm.start*` in this
+note instead: they are scopes created on demand, not service files.
+
+Use package-provided user units by default. A unit in
+`~/.config/systemd/user/` with the same name overrides the package unit in
+`/usr/lib/systemd/user/`; it is not an additional service.
+
+Current intended persistent units:
+
+| Unit | Origin | Enabled |
+| --- | --- | --- |
+| `hyprpaper.service` | package | yes |
+| `hypridle.service` | package | yes |
+| `waybar.service` | package | yes |
+| `swaync.service` | package | yes |
+| `hyprpolkitagent.service` | package | yes |
+
 ## Launch Policy
 
 - Apps and long-lived daemons started by Hyprland config go through
@@ -141,41 +163,13 @@ chezmoi should own files under the home directory, especially:
 ~/.config/systemd/user/xdg-desktop-autostart.target -> /dev/null
 ```
 
-Ansible should own packages and user service enablement.
+Ansible owns packages, user-service enablement, and the XDG-autostart target
+mask. The executable definitions are:
 
-Example Ansible tasks:
-
-```yaml
-- name: Install Hyprland session packages
-  become: true
-  ansible.builtin.package:
-    name:
-      - hyprland
-      - hypridle
-      - hyprpaper
-      - waybar
-      - uwsm
-    state: present
-
-- name: Enable Hyprland user services
-  ansible.builtin.systemd_service:
-    name: "{{ item }}"
-    enabled: true
-    scope: user
-  loop:
-    - waybar.service
-    - hypridle.service
-    - hyprpaper.service
-  environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
-
-- name: Mask XDG autostart for this user
-  ansible.builtin.systemd_service:
-    name: xdg-desktop-autostart.target
-    masked: true
-    scope: user
-  environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ ansible_user_uid }}"
+```text
+ansible/host_vars/localhost.yml
+ansible/roles/hyprland/tasks/main.yml
+ansible/roles/hyprland/tasks/user_services.yml
 ```
 
 Avoid starting `waybar`, `hypridle`, or `hyprpaper` from Ansible provisioning.

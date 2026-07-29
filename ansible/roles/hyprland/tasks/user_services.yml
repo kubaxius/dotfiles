@@ -1,0 +1,26 @@
+---
+# The inventory and its ownership classification are in
+# host_vars/localhost.yml under `hyprland_user_services`.
+- name: Configure Hyprland user service enablement
+  become: false
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}"
+    enabled: "{{ item.enabled }}"
+    scope: user
+  loop: "{{ hyprland_user_services }}"
+  loop_control:
+    label: "{{ item.name }} ({{ item.origin }})"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
+
+- name: Configure Hyprland user target masks
+  become: false
+  ansible.builtin.systemd_service:
+    name: "{{ item.name }}"
+    masked: "{{ item.masked }}"
+    scope: user
+  loop: "{{ hyprland_user_targets }}"
+  loop_control:
+    label: "{{ item.name }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"

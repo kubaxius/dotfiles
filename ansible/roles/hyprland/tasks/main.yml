@@ -1,0 +1,11 @@
+---
+- name: Install Hyprland session packages on Arch Linux
+  become: true
+  community.general.pacman:
+    name: "{{ hyprland_session_packages }}"
+    state: present
+  when: ansible_facts.os_family == "Archlinux"
+
+- name: Configure Hyprland user services
+  ansible.builtin.import_tasks: user_services.yml
+  when: ansible_facts.os_family == "Archlinux"

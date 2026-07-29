@@ -1,0 +1,44 @@
+---
+repo_dir: "{{ playbook_dir }}/.."
+chezmoi_source_dir: "{{ repo_dir }}/chezmoi"
+
+base_packages:
+  - git
+  - curl
+  - zsh
+  - chezmoi
+
+# Package names are currently Arch Linux names, matching this workstation's
+# Hyprland configuration.
+hyprland_session_packages:
+  - hyprland
+  - hypridle
+  - hyprpaper
+  - waybar
+  - uwsm
+  - hyprpolkitagent
+  - swaync
+
+# Canonical inventory of persistent Hyprland systemd user units. `origin`
+# records who supplies a unit; `enabled` says whether this machine enables it.
+# UWSM-created transient scopes remain documented in the Hyprland notes.
+hyprland_user_services:
+  - name: hyprpaper.service
+    origin: package
+    enabled: true
+  - name: hypridle.service
+    origin: package
+    enabled: true
+  - name: waybar.service
+    origin: package
+    enabled: true
+  - name: swaync.service
+    origin: package
+    enabled: true
+  - name: hyprpolkitagent.service
+    origin: package
+    enabled: true
+
+hyprland_user_targets:
+  - name: xdg-desktop-autostart.target
+    masked: true
