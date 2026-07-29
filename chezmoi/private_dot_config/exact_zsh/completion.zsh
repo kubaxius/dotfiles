@@ -46,3 +46,32 @@ mkdir -p -- "$zcompdump_dir"
 # temporary path variable into the interactive shell.
 compinit -d "$zcompdump_dir/zcompdump"
 unset zcompdump_dir
+
+# Register the completion definition provided by the tldr client. The client
+# can only list pages in its local cache, so refresh the complete page archive
+# quietly in the background when it is missing or more than a week old.
+if command -v tldr >/dev/null 2>&1; then
+  tldr_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/tldr"
+  tldr_update_stamp="$tldr_cache_dir/.last-completion-update"
+  tldr_update_lock="$tldr_cache_dir/.completion-update-lock"
+
+  mkdir -p -- "$tldr_cache_dir"
+  if [[ ! -e "$tldr_update_stamp" ]] ||
+    [[ -n "$(find "$tldr_update_stamp" -mtime +6 -print -quit 2>/dev/null)" ]]
+  then
+    if mkdir -- "$tldr_update_lock" 2>/dev/null; then
+      (
+        command tldr --update >/dev/null 2>&1
+        tldr_command_count="$(command tldr --list 2>/dev/null | wc -w)"
+        if (( tldr_command_count > 100 )); then
+          touch -- "$tldr_update_stamp"
+        fi
+        rmdir -- "$tldr_update_lock"
+      ) &!
+    fi
+  fi
+
+  tldr_completion="$(command tldr --print-completion zsh 2>/dev/null)" &&
+    eval "$tldr_completion"
+  unset tldr_cache_dir tldr_update_stamp tldr_update_lock tldr_completion
+fi
