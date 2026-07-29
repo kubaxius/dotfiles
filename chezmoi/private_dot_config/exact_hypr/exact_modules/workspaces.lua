@@ -99,7 +99,7 @@ hl.workspace_rule({
 })
 local function setup_workspace_8()
 	-- Programs to launch
-	uwsm.start_with_rules(programs.obsidian, "obsidian", { workspace = "8 silent", render_unfocused = true })
+	uwsm.start_with_rules(programs.obsidian, "obsidian", { workspace = "8 silent" })
 end
 
 ---------------------
