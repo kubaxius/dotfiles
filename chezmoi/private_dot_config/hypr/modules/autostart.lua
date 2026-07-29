@@ -17,7 +17,6 @@ hl.on("hyprland.start", function()
 
 	uwsm.start("nm-applet", "nm-applet")
 	uwsm.start("xsettingsd", "xsettingsd")
-	uwsm.start_raw([[test "$DESKTOP_SESSION" = hyprland-uwsm || (waybar & hyprpaper)]])
 
 	uwsm.start("ckb-next -b", "ckb-next")
 
