@@ -20,6 +20,7 @@ local function unit_option(unit_name)
 	return " -u hyprland-" .. unit_name .. ".scope"
 end
 
+-- Build a command to launch programs as units.
 function M.app(command, unit_name)
 	local unit = unit_option(unit_name)
 
@@ -34,10 +35,12 @@ function M.app(command, unit_name)
 		.. "; fi"
 end
 
+-- Execute a command as a unit and get output.
 function M.exec(command, unit_name)
 	return hl.dsp.exec_cmd(M.app(command, unit_name))
 end
 
+-- Start program as a unit.
 function M.start(command, unit_name)
 	hl.exec_cmd(M.app(command, unit_name))
 end
@@ -49,14 +52,17 @@ function M.start_with_rules(command, unit_name, rules)
 	hl.exec_cmd(M.app(command, unit_name), rules)
 end
 
+-- Execute raw command.
 function M.raw(command)
 	return hl.dsp.exec_cmd(command)
 end
 
+-- Start program without turning it into a unit.
 function M.start_raw(command)
 	hl.exec_cmd(command)
 end
 
+-- Turns off uwsm, basically logging user out.
 function M.stop()
 	return hl.dsp.exec_cmd("uwsm stop")
 end
