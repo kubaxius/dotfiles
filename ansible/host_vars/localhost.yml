@@ -9,10 +9,11 @@ base_packages:
   - chezmoi
 
 shell_packages:
-  - zsh
-  - fzf
-  - navi
-  - tmux
+  - zsh # shell
+  - fzf # fuzzy search
+  - navi # snippet manager
+  - tmux # terminal multiplexer
+  - entr # allows running scripts on file change
 
 # Package names are currently Arch Linux names, matching this workstation's
 # Hyprland configuration.
@@ -21,9 +22,9 @@ hyprland_session_packages:
   - hypridle
   - hyprpaper
   - waybar
-  - uwsm
-  - hyprpolkitagent
-  - swaync
+  - uwsm # bridge for graphical user session and systemd
+  - hyprpolkitagent # the popup you get while something asks for sudo
+  - swaync # notification manager
 
 # Canonical inventory of persistent Hyprland systemd user units. `origin`
 # records who supplies a unit; `enabled` says whether this machine enables it.

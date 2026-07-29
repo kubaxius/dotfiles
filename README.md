@@ -189,6 +189,14 @@ The script runs:
 ansible-playbook --inventory ansible/inventory.yml --ask-become-pass ansible/playbook.yml
 ```
 
+The playbook also clones [Tpack](https://github.com/tmuxpack/tpack) to
+`~/.tmux/plugins/tpm`, which is Tpack's TPM-compatible Git-clone location.
+This checkout is idempotent: a first run clones Tpack and later runs update its
+`main` branch. Add Tpack-managed plugins as `set -g @plugin
+'owner/repository'` lines before the Tpack `run` line in
+`chezmoi/private_dot_config/tmux/tmux.conf`; reload tmux and press `prefix` +
+`I` to install them.
+
 ## Recommended test flow
 
 Use this repo inside a fresh VM first:
