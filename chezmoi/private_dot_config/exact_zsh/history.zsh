@@ -4,7 +4,7 @@
 # =============================================================================
 
 # Store command history in this file.
-HISTFILE="$HOME/.zsh/history"
+HISTFILE="$HOME/.local/share/zsh/history"
 
 # Ensure the history directory and file exist before zsh tries to write them.
 [[ -d "${HISTFILE:h}" ]] || mkdir -p -- "${HISTFILE:h}"
