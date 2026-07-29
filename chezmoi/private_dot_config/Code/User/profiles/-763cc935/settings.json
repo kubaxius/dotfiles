@@ -95,16 +95,6 @@
   },
 
   // =========================
-  // Markdown Lint rules
-  // =========================
-
-  "markdownlint.config": {
-    "MD024": {
-      "siblings_only": true
-    }
-  },
-
-  // =========================
   // Terminal
   // =========================
 
@@ -215,8 +205,9 @@
   },
   "chat.viewSessions.orientation": "stacked",
   "go.toolsManagement.autoUpdate": true,
-  "window.newWindowProfile": "Default",
-  "github.copilot.nextEditSuggestions.eagerness": "low",
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "lmstudio:lmstudio",
+  "workbench.colorTheme": "Solarized Dark",
   "github.copilot.enable": {
     "*": false,
     "plaintext": false,
