@@ -17,7 +17,7 @@ macros:
   - name: reload-config
     commands:
       - display "#{log_info} Loading config... "
-      - source-file $HOME/.tmux.conf
+      - source-file ~/.config/tmux/tmux.conf
       - display -p "\n\n... Press ENTER to continue"
   - name: restart-pane
     commands:
@@ -266,8 +266,14 @@ items:
         key: ","
         command: customize-mode -Z
   - separator: true
-  - name: Time
+  - name: Plugin Manager (tpack)
     key: T
+    command: display-popup -E -w 100 -h 30 "$TMUX_PLUGIN_MANAGER_PATH/tpm/tpack tui"
+  - name: Tmux FZF
+    key: F
+    command: run-shell -b $TMUX_PLUGIN_MANAGER_PATH/plugins/tmux-fzf-1b3181280a8e/main.sh
+  - name: Time
+    key: t
     command: clock-mode
   - name: Show messages
     key: "~"
