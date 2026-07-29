@@ -38,5 +38,11 @@ fpath=("$HOME/.zfunc" $fpath)
 # the recommended behavior for zsh's bundled completion functions.
 autoload -Uz compinit
 
-# Initialize zsh's completion system using the configured styles and `$fpath`.
-compinit
+# Keep the generated completion dump out of the managed Zsh configuration.
+zcompdump_dir="$HOME/.cache/zsh"
+mkdir -p -- "$zcompdump_dir"
+
+# Initialize completion using the cached registry, then avoid leaking the
+# temporary path variable into the interactive shell.
+compinit -d "$zcompdump_dir/zcompdump"
+unset zcompdump_dir
