@@ -4,5 +4,6 @@
 
   roles:
     - role: base
+    - role: shell
     - role: hyprland
     - role: chezmoi

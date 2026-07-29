@@ -8,6 +8,12 @@ base_packages:
   - zsh
   - chezmoi
 
+shell_packages:
+  - zsh
+  - fzf
+  - navi
+  - tmux
+
 # Package names are currently Arch Linux names, matching this workstation's
 # Hyprland configuration.
 hyprland_session_packages:
