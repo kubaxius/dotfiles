@@ -53,9 +53,9 @@ local function setup_workspace_4()
 	-- Programs to launch
 end
 
----------------------
----- WORKSPACE 5 ----
----------------------
+-------------------------------
+---- WORKSPACE 5 - BROWSER ----
+-------------------------------
 hl.workspace_rule({
 	workspace = "5",
 	persistent = true,
@@ -90,9 +90,9 @@ local function setup_workspace_7()
 	-- Programs to launch
 end
 
----------------------
----- WORKSPACE 8 ----
----------------------
+-----------------------------
+---- WORKSPACE 8 - NOTES ----
+-----------------------------
 hl.workspace_rule({
 	workspace = "8",
 	persistent = true,
@@ -102,15 +102,26 @@ local function setup_workspace_8()
 	uwsm.start_with_rules(programs.notes, "obsidian", { workspace = "8 silent", render_unfocused = true })
 end
 
----------------------
----- WORKSPACE 9 ----
----------------------
+-----------------------------
+---- WORKSPACE 9 - MUSIC ----
+-----------------------------
 hl.workspace_rule({
 	workspace = "9",
 	persistent = true,
 })
+
+hl.window_rule({
+	name = "tidal-workspace",
+	match = {
+		class = "^com\\.mastermindzh\\.tidal-hifi$",
+	},
+
+	workspace = "9 silent",
+	render_unfocused = true,
+})
+
 local function setup_workspace_9()
-	-- Programs to launch
+	uwsm.start(programs.music, "tidal")
 end
 
 function M.setup_workspaces()
