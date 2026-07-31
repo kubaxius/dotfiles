@@ -9,7 +9,6 @@ base_packages:
   - chezmoi
 
 # Optional additions enabled on this machine.
-# A typical laptop could instead use: [laptop, media_apps]
 workstation_features:
-  - corsair
+  - laptop
   - media_apps

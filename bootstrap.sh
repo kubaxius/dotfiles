@@ -4,6 +4,7 @@ set -euo pipefail
 REPO_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 ANSIBLE_DIR="$REPO_DIR/ansible"
 PLAYBOOK="$ANSIBLE_DIR/playbook.yml"
+INVENTORY="${ANSIBLE_INVENTORY:-$ANSIBLE_DIR/inventories/desktop/inventory.yml}"
 
 log() {
   printf '
@@ -46,7 +47,15 @@ if [[ ! -f "$PLAYBOOK" ]]; then
   exit 1
 fi
 
+if [[ ! -f "$INVENTORY" ]]; then
+  echo "Error: inventory not found: $INVENTORY" >&2
+  exit 1
+fi
+
 log "Running Ansible playbook"
-ansible-playbook   --inventory "$ANSIBLE_DIR/inventory.yml"   --ask-become-pass   "$PLAYBOOK"
+ansible-playbook \
+  --inventory "$INVENTORY" \
+  --ask-become-pass \
+  "$PLAYBOOK"
 
 log "Bootstrap complete"

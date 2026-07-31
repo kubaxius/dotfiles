@@ -47,9 +47,14 @@
     },
     {
       "type": "shell",
-      "label": "Run ansible setup",
+      "label": "Run Ansible setup (desktop)",
       "command": "ansible-playbook",
-      "args": ["-K", "-i ansible/inventory.yml", "ansible/playbook.yml"],
+      "args": [
+        "-K",
+        "-i",
+        "ansible/inventories/desktop/inventory.yml",
+        "ansible/playbook.yml"
+      ],
       "problemMatcher": []
     }
   ],

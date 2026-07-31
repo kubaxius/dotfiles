@@ -18,13 +18,21 @@ home directory entries.
 .
 ├── bootstrap.sh
 ├── ansible/
-│   ├── inventory.yml
+│   ├── inventories/
+│   │   ├── desktop/
+│   │   │   ├── inventory.yml
+│   │   │   └── host_vars/
+│   │   │       └── localhost.yml
+│   │   └── laptop/
+│   │       ├── inventory.yml
+│   │       └── host_vars/
+│   │           └── localhost.yml
 │   ├── playbook.yml
-│   ├── group_vars/
-│   │   └── localhost.yml
 │   └── roles/
 │       ├── base/
-│       └── chezmoi/
+│       ├── chezmoi/
+│       ├── hyprland/
+│       └── shell/
 ├── chezmoi/
 │   ├── dot_zshrc
 │   ├── dot_zshenv
@@ -186,7 +194,20 @@ If Ansible is missing, `bootstrap.sh` will try to install it using `pacman`, `ap
 The script runs:
 
 ```bash
-ansible-playbook --inventory ansible/inventory.yml --ask-become-pass ansible/playbook.yml
+ansible-playbook \
+  --inventory ansible/inventories/desktop/inventory.yml \
+  --ask-become-pass \
+  ansible/playbook.yml
+```
+
+The desktop inventory is the default. A future machine profile can be selected
+without editing the script by setting `ANSIBLE_INVENTORY` to its inventory
+file before running `./bootstrap.sh`.
+
+For example, run the laptop profile with:
+
+```bash
+ANSIBLE_INVENTORY=ansible/inventories/laptop/inventory.yml ./bootstrap.sh
 ```
 
 The playbook also clones [Tpack](https://github.com/tmuxpack/tpack) to
