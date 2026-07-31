@@ -1,0 +1,27 @@
+% systemd, services, list, browse
+# Browse loaded services by runtime state
+systemctl <scope> list-units --type=service <unit_state> --no-pager --no-legend | fzf --layout=reverse --border --header='Services (Esc to quit)'
+
+$ scope: printf '%s\n' user system --- --map "sed 's/^user$/--user/; s/^system$/--system/'" --prevent-extra
+$ unit_state: printf '%s\n' all running active inactive failed exited dead --- --map "sed 's/^all$/--all/; t; s/^/--state=/'" --prevent-extra
+
+% systemd, services, files, list, browse
+# Browse installed service files by enablement state
+systemctl <scope> list-unit-files --type=service <file_state> --no-pager --no-legend | fzf --layout=reverse --border --header='Service files (Esc to quit)'
+
+$ scope: printf '%s\n' user system --- --map "sed 's/^user$/--user/; s/^system$/--system/'" --prevent-extra
+$ file_state: printf '%s\n' all enabled enabled-runtime disabled static linked linked-runtime alias masked masked-runtime indirect generated transient bad --- --map "sed 's/^all$/--all/; t; s/^/--state=/'" --prevent-extra
+
+% systemd, services, status
+# Show the status of a service
+systemctl <scope> status '<service>'
+
+$ scope: printf '%s\n' user system --- --map "sed 's/^user$/--user/; s/^system$/--system/'" --prevent-extra
+$ service: systemctl <scope> list-unit-files --type=service --no-pager --no-legend | awk '{print $1}'
+
+% systemd, services, journal, logs
+# Follow the journal for a service
+journalctl <scope> --unit='<service>' --follow
+
+$ scope: printf '%s\n' user system --- --map "sed 's/^user$/--user/; s/^system$/--system/'" --prevent-extra
+$ service: systemctl <scope> list-unit-files --type=service --no-pager --no-legend | awk '{print $1}'

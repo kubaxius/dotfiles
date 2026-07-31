@@ -1,6 +1,8 @@
-% first cheat
+% flatpak, list, applications
+# Print running flatpak applications
+flatpak ps --columns=application,pid,child-pid
 
-# print something
-echo "My name is <name>!"
-
-$ name: whoami
+% git, branch, code
+# Change branch
+git checkout <branch>
+$ branch: git branch | awk '{print $NF}'
