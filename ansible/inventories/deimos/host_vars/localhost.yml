@@ -1,4 +1,5 @@
 ---
+# Deimos is my main desktop PC.
 repo_dir: "{{ playbook_dir }}/.."
 chezmoi_source_dir: "{{ repo_dir }}/chezmoi"
 
@@ -11,4 +12,5 @@ base_packages:
 # Optional additions enabled on this machine.
 workstation_features:
   - corsair
+  - razer
   - media_apps

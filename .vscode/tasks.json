@@ -47,12 +47,12 @@
     },
     {
       "type": "shell",
-      "label": "Run Ansible setup (desktop)",
+      "label": "Run Ansible setup (Deimos)",
       "command": "ansible-playbook",
       "args": [
         "-K",
         "-i",
-        "ansible/inventories/desktop/inventory.yml",
+        "ansible/inventories/deimos/inventory.yml",
         "ansible/playbook.yml"
       ],
       "problemMatcher": []

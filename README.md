@@ -19,7 +19,7 @@ home directory entries.
 ├── bootstrap.sh
 ├── ansible/
 │   ├── inventories/
-│   │   ├── desktop/
+│   │   ├── deimos/
 │   │   │   ├── inventory.yml
 │   │   │   └── host_vars/
 │   │   │       └── localhost.yml
@@ -191,18 +191,18 @@ Run:
 
 If Ansible is missing, `bootstrap.sh` will try to install it using `pacman`, `apt-get`, or `dnf`.
 
-The script runs:
+The script discovers the available profiles under `ansible/inventories/` and
+asks which one to use. Press Enter to select Deimos, the default:
 
-```bash
-ansible-playbook \
-  --inventory ansible/inventories/desktop/inventory.yml \
-  --ask-become-pass \
-  ansible/playbook.yml
+```text
+Available inventory profiles:
+  1) deimos
+  2) laptop
+Select inventory [1]:
 ```
 
-The desktop inventory is the default. A future machine profile can be selected
-without editing the script by setting `ANSIBLE_INVENTORY` to its inventory
-file before running `./bootstrap.sh`.
+For automation, bypass the prompt by setting `ANSIBLE_INVENTORY` to an
+inventory file before running `./bootstrap.sh`.
 
 For example, run the laptop profile with:
 
