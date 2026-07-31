@@ -1,0 +1,4 @@
+interface:
+  display_name: "Navi Command Notes"
+  short_description: "Save commands and wizards as Navi cheats"
+  default_prompt: "Use $navi-command-notes to save this command in my Navi cheatsheets."

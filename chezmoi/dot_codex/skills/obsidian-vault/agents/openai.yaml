@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian Vault"
+  short_description: "Work with the personal Obsidian vault"
+  default_prompt: "Use $obsidian-vault to add this note to my vault."
