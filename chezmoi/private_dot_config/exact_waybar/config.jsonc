@@ -7,6 +7,7 @@
   "spacing": 4, // Gaps between modules (4px)
   // Choose the order of the modules
   "modules-left": ["hyprland/workspaces", "custom/media"],
+  // TODO: Replace sway/window and sway/language with their Hyprland modules.
   "modules-center": ["sway/window"],
   "modules-right": [
     "mpd",
@@ -146,6 +147,7 @@
   "battery#bat2": {
     "bat": "BAT2"
   },
+  // TODO: Hide or gate this module when power-profiles-daemon is unavailable.
   "power-profiles-daemon": {
     "format": "{icon}",
     "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
@@ -185,6 +187,7 @@
     },
     "on-click": "pavucontrol"
   },
+  // TODO: Add mediaplayer.py or remove this custom media module.
   "custom/media": {
     "format": "{icon} {text}",
     "return-type": "json",
@@ -197,6 +200,7 @@
     "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
     // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
   },
+  // TODO: Add power_menu.xml or remove/replace this custom power module.
   "custom/power": {
     "format": "⏻ ",
     "tooltip": false,

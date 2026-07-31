@@ -18,6 +18,7 @@ hl.on("hyprland.start", function()
 	uwsm.start("nm-applet", "nm-applet")
 	uwsm.start("xsettingsd", "xsettingsd")
 
+	-- TODO: Start ckb-next only when the Corsair workstation feature is enabled.
 	uwsm.start("ckb-next -b", "ckb-next")
 
 	uwsm.start("wl-paste --type text --watch cliphist store", "wl-paste-text")
