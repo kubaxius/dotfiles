@@ -24,7 +24,7 @@ local function unit_option(unit_name)
 	return " -u hyprland-" .. unit_name .. ".scope"
 end
 
----Creates a shell command that launches an application in a UWSM scope.
+---Creates a shell command that launches an application in a UWSM scope. DOES NOT EXECUTE IT.
 ---Uses `uwsm-app` when available and falls back to the legacy `uwsm app` command for compatibility.
 ---@param command string Shell command for the application to launch.
 ---@param unit_name? string Scope unit suffix used to name the systemd scope.
@@ -43,7 +43,7 @@ function M.app(command, unit_name)
 		.. "; fi"
 end
 
----Creates a Hyprland `exec` directive that starts an application through UWSM.
+---Creates and retrurns a Hyprland `exec` directive that starts an application through UWSM.
 ---@param command string Shell command for the application to launch.
 ---@param unit_name? string Scope unit suffix used to name the systemd scope.
 ---@return string directive Hyprland configuration directive.
