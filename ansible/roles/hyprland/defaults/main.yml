@@ -60,7 +60,7 @@ hyprland_feature_packages:
   media_apps:
     - flatpak
 
-hyprland_aur_builder_user: aur_builder
+hyprland_aur_builder_user: ansible_aur_builder
 hyprland_paru_build_dir: >-
   /home/{{ hyprland_aur_builder_user }}/.cache/ansible/paru-bin
 

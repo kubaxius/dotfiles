@@ -6,78 +6,6 @@
   changed_when: false
   failed_when: false
 
-- name: Create the unprivileged AUR build user
-  become: true
-  ansible.builtin.user:
-    name: "{{ hyprland_aur_builder_user }}"
-    create_home: true
-    shell: /bin/bash
-    state: present
-
-- name: Allow the AUR build user to install built packages
-  become: true
-  community.general.sudoers:
-    name: aur-builder-pacman
-    user: "{{ hyprland_aur_builder_user }}"
-    commands:
-      - /usr/bin/pacman
-    nopassword: true
-    state: present
-
-- name: Install Paru build dependencies
-  become: true
-  community.general.pacman:
-    name:
-      - base-devel
-      - git
-    state: present
-  when: hyprland_paru.rc != 0
-
-- name: Create the Paru build directory
-  become: true
-  become_user: "{{ hyprland_aur_builder_user }}"
-  ansible.builtin.file:
-    path: "{{ hyprland_paru_build_dir | dirname }}"
-    state: directory
-    mode: "0755"
-  when: hyprland_paru.rc != 0
-
-- name: Download the paru-bin PKGBUILD
-  become: true
-  become_user: "{{ hyprland_aur_builder_user }}"
-  ansible.builtin.git:
-    repo: https://aur.archlinux.org/paru-bin.git
-    dest: "{{ hyprland_paru_build_dir }}"
-    version: master
-    update: true
-  when: hyprland_paru.rc != 0
-
-- name: Build paru-bin
-  become: true
-  become_user: "{{ hyprland_aur_builder_user }}"
-  ansible.builtin.command:
-    cmd: makepkg --clean --cleanbuild --noconfirm
-    chdir: "{{ hyprland_paru_build_dir }}"
-  changed_when: true
-  when: hyprland_paru.rc != 0
-
-- name: Find the built paru-bin package
-  become: true
-  become_user: "{{ hyprland_aur_builder_user }}"
-  ansible.builtin.command:
-    cmd: makepkg --packagelist
-    chdir: "{{ hyprland_paru_build_dir }}"
-  register: hyprland_paru_package_files
-  changed_when: false
-  when: hyprland_paru.rc != 0
-
-- name: Install the built paru-bin package
-  become: true
-  community.general.pacman:
-    name: "{{ hyprland_paru_package_files.stdout_lines }}"
-    state: present
-  when: hyprland_paru.rc != 0
-
 - name: Check Hyprland workstation package installation
   become: false
   ansible.builtin.command:
@@ -101,18 +29,126 @@
   changed_when: false
   failed_when: false
 
-- name: Install missing Hyprland workstation packages with paru
-  become: true
-  become_user: "{{ hyprland_aur_builder_user }}"
-  ansible.builtin.command:
-    argv:
-      - paru
-      - --sync
-      - --needed
-      - --noconfirm
-      - "{{ item.item }}"
-  loop: "{{ hyprland_package_status.results }}"
-  loop_control:
-    label: "{{ item.item }}"
-  changed_when: true
-  when: item.rc != 0
+- name: Record missing workstation packages
+  ansible.builtin.set_fact:
+    hyprland_missing_packages: >-
+      {{
+        hyprland_package_status.results
+        | rejectattr("rc", "equalto", 0)
+        | map(attribute="item")
+        | list
+      }}
+    hyprland_aur_work_required: >-
+      {{
+        hyprland_paru.rc != 0
+        or (
+          hyprland_package_status.results
+          | rejectattr("rc", "equalto", 0)
+          | list
+          | length > 0
+        )
+      }}
+
+- name: Bootstrap paru and install missing workstation packages
+  when: hyprland_aur_work_required
+  block:
+    - name: Create the temporary unprivileged AUR build user
+      become: true
+      ansible.builtin.user:
+        name: "{{ hyprland_aur_builder_user }}"
+        create_home: true
+        shell: /bin/bash
+        state: present
+
+    - name: Allow the AUR build user to install built packages
+      become: true
+      community.general.sudoers:
+        name: ansible-aur-builder-pacman
+        user: "{{ hyprland_aur_builder_user }}"
+        commands:
+          - /usr/bin/pacman
+        nopassword: true
+        state: present
+
+    - name: Install Paru build dependencies
+      become: true
+      community.general.pacman:
+        name:
+          - base-devel
+          - git
+        state: present
+      when: hyprland_paru.rc != 0
+
+    - name: Create the Paru build directory
+      become: true
+      become_user: "{{ hyprland_aur_builder_user }}"
+      ansible.builtin.file:
+        path: "{{ hyprland_paru_build_dir | dirname }}"
+        state: directory
+        mode: "0755"
+      when: hyprland_paru.rc != 0
+
+    - name: Download the paru-bin PKGBUILD
+      become: true
+      become_user: "{{ hyprland_aur_builder_user }}"
+      ansible.builtin.git:
+        repo: https://aur.archlinux.org/paru-bin.git
+        dest: "{{ hyprland_paru_build_dir }}"
+        version: master
+        update: true
+      when: hyprland_paru.rc != 0
+
+    - name: Build paru-bin
+      become: true
+      become_user: "{{ hyprland_aur_builder_user }}"
+      ansible.builtin.command:
+        cmd: makepkg --clean --cleanbuild --noconfirm
+        chdir: "{{ hyprland_paru_build_dir }}"
+      changed_when: true
+      when: hyprland_paru.rc != 0
+
+    - name: Find the built paru-bin package
+      become: true
+      become_user: "{{ hyprland_aur_builder_user }}"
+      ansible.builtin.command:
+        cmd: makepkg --packagelist
+        chdir: "{{ hyprland_paru_build_dir }}"
+      register: hyprland_paru_package_files
+      changed_when: false
+      when: hyprland_paru.rc != 0
+
+    - name: Install the built paru-bin package
+      become: true
+      community.general.pacman:
+        name: "{{ hyprland_paru_package_files.stdout_lines }}"
+        state: present
+      when: hyprland_paru.rc != 0
+
+    - name: Install missing Hyprland workstation packages with paru
+      become: true
+      become_user: "{{ hyprland_aur_builder_user }}"
+      ansible.builtin.command:
+        argv:
+          - paru
+          - --sync
+          - --needed
+          - --noconfirm
+          - "{{ item }}"
+      loop: "{{ hyprland_missing_packages }}"
+      loop_control:
+        label: "{{ item }}"
+      changed_when: true
+
+  always:
+    - name: Remove the AUR builder's Pacman permission
+      become: true
+      community.general.sudoers:
+        name: ansible-aur-builder-pacman
+        state: absent
+
+    - name: Remove the temporary AUR build user and home
+      become: true
+      ansible.builtin.user:
+        name: "{{ hyprland_aur_builder_user }}"
+        state: absent
+        remove: true
