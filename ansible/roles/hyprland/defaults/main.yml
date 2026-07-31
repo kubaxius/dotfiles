@@ -53,7 +53,6 @@ hyprland_feature_packages:
     - ckb-next
   razer:
     - openrazer-daemon
-    - razergenie
   laptop:
     - brightnessctl
     - power-profiles-daemon
@@ -82,8 +81,15 @@ hyprland_feature_user_services:
   laptop: []
   media_apps: []
 
-hyprland_media_flatpaks:
-  - com.mastermindzh.tidal-hifi
+hyprland_feature_flatpaks:
+  corsair: []
+  razer:
+    - name: xyz.z3ntu.razergenie
+      method: system
+  laptop: []
+  media_apps:
+    - name: com.mastermindzh.tidal-hifi
+      method: user
 
 # Persistent user units supplied by the session packages. UWSM-created
 # transient scopes remain documented in the Hyprland notes.

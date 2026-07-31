@@ -18,15 +18,20 @@
   tags:
     - hyprland-feature-resolution
     - hyprland-user-services
+    - hyprland-flatpaks
+    - hyprland-media-apps
 
 - name: Initialize selected feature packages and services
   ansible.builtin.set_fact:
     hyprland_selected_feature_packages: []
     hyprland_selected_feature_services: []
     hyprland_selected_feature_user_services: []
+    hyprland_selected_feature_flatpaks: []
   tags:
     - hyprland-feature-resolution
     - hyprland-user-services
+    - hyprland-flatpaks
+    - hyprland-media-apps
 
 - name: Resolve selected workstation features
   ansible.builtin.set_fact:
@@ -42,10 +47,17 @@
         hyprland_selected_feature_user_services
         + hyprland_feature_user_services[item]
       }}
+    hyprland_selected_feature_flatpaks: >-
+      {{
+        hyprland_selected_feature_flatpaks
+        + hyprland_feature_flatpaks[item]
+      }}
   loop: "{{ hyprland_workstation_features }}"
   tags:
     - hyprland-feature-resolution
     - hyprland-user-services
+    - hyprland-flatpaks
+    - hyprland-media-apps
 
 - name: Report resolved workstation profile
   ansible.builtin.debug:
@@ -73,6 +85,7 @@
             + hyprland_selected_feature_user_services
           ) | unique
         }}
+      flatpaks: "{{ hyprland_selected_feature_flatpaks }}"
     verbosity: 1
   tags:
     - hyprland-feature-resolution

@@ -1,24 +1,34 @@
 ---
-- name: Configure Flathub for the current user
-  become: false
+- name: Configure Flathub for selected installation scopes
+  become: "{{ item == 'system' }}"
   community.general.flatpak_remote:
     name: flathub
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
-    method: user
+    method: "{{ item }}"
     state: present
-  when:
-    - "'media_apps' in hyprland_workstation_features"
+  loop: >-
+    {{
+      hyprland_selected_feature_flatpaks
+      | map(attribute="method")
+      | unique
+      | list
+    }}
+  loop_control:
+    label: "{{ item }}"
   tags:
+    - hyprland-flatpaks
     - hyprland-media-apps
 
-- name: Install selected media applications from Flathub
-  become: false
+- name: Install selected applications from Flathub
+  become: "{{ item.method == 'system' }}"
   community.general.flatpak:
-    name: "{{ hyprland_media_flatpaks }}"
-    method: user
+    name: "{{ item.name }}"
+    method: "{{ item.method }}"
     remote: flathub
     state: present
-  when:
-    - "'media_apps' in hyprland_workstation_features"
+  loop: "{{ hyprland_selected_feature_flatpaks }}"
+  loop_control:
+    label: "{{ item.name }} ({{ item.method }})"
   tags:
+    - hyprland-flatpaks
     - hyprland-media-apps
