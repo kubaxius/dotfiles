@@ -24,6 +24,10 @@ local function unit_option(unit_name)
 	return " -u hyprland-" .. unit_name .. ".scope"
 end
 
+----------------------
+---- UWSM Managed ----
+----------------------
+
 ---Creates a shell command that launches an application in a UWSM scope. DOES NOT EXECUTE IT.
 ---Uses `uwsm-app` when available and falls back to the legacy `uwsm app` command for compatibility.
 ---@param command string Shell command for the application to launch.
@@ -67,6 +71,10 @@ function M.start_with_rules(command, unit_name, rules)
 	hl.exec_cmd(M.app(command, unit_name), rules)
 end
 
+-------------
+---- RAW ----
+-------------
+
 ---Creates a Hyprland `exec` directive without routing the command through UWSM.
 ---Use this for commands that must run outside a UWSM-managed application scope.
 ---@param command string Shell command to include in the directive.
@@ -81,6 +89,10 @@ end
 function M.start_raw(command)
 	hl.exec_cmd(command)
 end
+
+----------------
+---- SYSTEM ----
+----------------
 
 ---Creates a Hyprland `exec` directive that stops the active UWSM session.
 ---@return string directive Hyprland configuration directive.
