@@ -5,123 +5,14 @@
       - ansible_facts.os_family == "Archlinux"
     fail_msg: The hyprland role currently supports Arch Linux only.
 
-- name: Validate requested workstation features against supported features
-  ansible.builtin.assert:
-    that:
-      - >-
-        hyprland_workstation_features
-        | difference(hyprland_feature_packages.keys() | list)
-        | length == 0
-    fail_msg: >-
-      Unknown workstation feature(s):
-      {{
-        hyprland_workstation_features
-        | difference(hyprland_feature_packages.keys() | list)
-        | join(', ')
-      }}.
-      Supported features:
-      {{ hyprland_feature_packages.keys() | sort | join(', ') }}.
+- name: Resolve the workstation feature set
+  ansible.builtin.import_tasks: features.yml
 
-  tags:
-    - hyprland-feature-resolution
+- name: Configure AUR support and install workstation packages
+  ansible.builtin.import_tasks: aur.yml
 
-- name: Initialize selected feature packages and services
-  ansible.builtin.set_fact:
-    hyprland_selected_feature_packages: []
-    hyprland_selected_feature_services: []
+- name: Configure workstation services
+  ansible.builtin.import_tasks: services.yml
 
-  tags:
-    - hyprland-feature-resolution
-
-- name: Resolve selected workstation features
-  ansible.builtin.set_fact:
-    hyprland_selected_feature_packages: >-
-      {{ hyprland_selected_feature_packages + hyprland_feature_packages[item] }}
-    hyprland_selected_feature_services: >-
-      {{
-        hyprland_selected_feature_services
-        + hyprland_feature_system_services[item]
-      }}
-  loop: "{{ hyprland_workstation_features }}"
-  tags:
-    - hyprland-feature-resolution
-
-- name: Report resolved workstation profile
-  ansible.builtin.debug:
-    msg:
-      features: "{{ hyprland_workstation_features }}"
-      packages: >-
-        {{
-          (
-            hyprland_session_packages
-            + hyprland_integration_packages
-            + hyprland_utility_packages
-            + hyprland_graphical_packages
-            + hyprland_selected_feature_packages
-          ) | unique
-        }}
-      system_services: >-
-        {{
-          (hyprland_system_services + hyprland_selected_feature_services)
-          | unique
-        }}
-    verbosity: 1
-
-  tags:
-    - hyprland-feature-resolution
-
-- name: Install Hyprland workstation packages on Arch Linux
-  become: true
-  community.general.pacman:
-    name: >-
-      {{
-        (
-          hyprland_session_packages
-          + hyprland_integration_packages
-          + hyprland_utility_packages
-          + hyprland_graphical_packages
-          + hyprland_selected_feature_packages
-        ) | unique
-      }}
-    state: present
-
-- name: Enable required workstation system services
-  become: true
-  ansible.builtin.systemd_service:
-    name: "{{ item }}"
-    enabled: true
-    state: started
-  loop: >-
-    {{
-      (hyprland_system_services + hyprland_selected_feature_services)
-      | unique
-    }}
-
-- name: Configure Flathub for the current user
-  become: false
-  community.general.flatpak_remote:
-    name: flathub
-    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
-    method: user
-    state: present
-  when:
-    - "'media_apps' in hyprland_workstation_features"
-  tags:
-    - hyprland-media-apps
-
-- name: Install selected media applications from Flathub
-  become: false
-  community.general.flatpak:
-    name: "{{ hyprland_media_flatpaks }}"
-    method: user
-    remote: flathub
-    state: present
-  when:
-    - "'media_apps' in hyprland_workstation_features"
-  tags:
-    - hyprland-media-apps
-
-- name: Configure Hyprland user services
-  ansible.builtin.import_tasks: user_services.yml
-  tags:
-    - hyprland-user-services
+- name: Configure Flathub applications
+  ansible.builtin.import_tasks: flathub.yml

@@ -42,6 +42,7 @@ hyprland_graphical_packages:
   - rofi
   - obsidian
   - pavucontrol
+  - kdeconnect
 
 # The playbook maps the current host's `workstation_features` into this
 # role-scoped input.
@@ -50,11 +51,18 @@ hyprland_workstation_features: []
 hyprland_feature_packages:
   corsair:
     - ckb-next
+  razer:
+    - openrazer-daemon
+    - razergenie
   laptop:
     - brightnessctl
     - power-profiles-daemon
   media_apps:
     - flatpak
+
+hyprland_aur_builder_user: aur_builder
+hyprland_paru_build_dir: >-
+  /home/{{ hyprland_aur_builder_user }}/.cache/ansible/paru-bin
 
 hyprland_system_services:
   - NetworkManager.service
@@ -62,8 +70,16 @@ hyprland_system_services:
 hyprland_feature_system_services:
   corsair:
     - ckb-next-daemon.service
+  razer: []
   laptop:
     - power-profiles-daemon.service
+  media_apps: []
+
+hyprland_feature_user_services:
+  corsair: []
+  razer:
+    - openrazer-daemon.service
+  laptop: []
   media_apps: []
 
 hyprland_media_flatpaks:

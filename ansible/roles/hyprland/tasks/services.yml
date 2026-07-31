@@ -1,15 +1,33 @@
 ---
+- name: Enable required workstation system services
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop: >-
+    {{
+      (hyprland_system_services + hyprland_selected_feature_services)
+      | unique
+    }}
+
 - name: Enable Hyprland user services
   become: false
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
     scope: user
-  loop: "{{ hyprland_user_services.enable }}"
+  loop: >-
+    {{
+      (hyprland_user_services.enable + hyprland_selected_feature_user_services)
+      | unique
+    }}
   loop_control:
     label: "{{ item }}"
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
+  tags:
+    - hyprland-user-services
 
 - name: Unmask shared user targets
   become: false
@@ -22,6 +40,8 @@
     label: "{{ item }}"
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
+  tags:
+    - hyprland-user-services
 
 - name: Mask Hyprland user targets
   become: false
@@ -34,3 +54,5 @@
     label: "{{ item }}"
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
+  tags:
+    - hyprland-user-services

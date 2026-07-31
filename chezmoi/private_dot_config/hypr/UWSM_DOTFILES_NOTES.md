@@ -176,7 +176,7 @@ mask. The executable definitions are:
 ```text
 ansible/roles/hyprland/defaults/main.yml
 ansible/roles/hyprland/tasks/main.yml
-ansible/roles/hyprland/tasks/user_services.yml
+ansible/roles/hyprland/tasks/services.yml
 ```
 
 Avoid starting `waybar`, `hypridle`, or `hyprpaper` from Ansible provisioning.

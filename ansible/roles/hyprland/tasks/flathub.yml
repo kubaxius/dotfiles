@@ -1,0 +1,24 @@
+---
+- name: Configure Flathub for the current user
+  become: false
+  community.general.flatpak_remote:
+    name: flathub
+    flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
+    method: user
+    state: present
+  when:
+    - "'media_apps' in hyprland_workstation_features"
+  tags:
+    - hyprland-media-apps
+
+- name: Install selected media applications from Flathub
+  become: false
+  community.general.flatpak:
+    name: "{{ hyprland_media_flatpaks }}"
+    method: user
+    remote: flathub
+    state: present
+  when:
+    - "'media_apps' in hyprland_workstation_features"
+  tags:
+    - hyprland-media-apps

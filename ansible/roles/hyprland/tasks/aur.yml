@@ -1,0 +1,118 @@
+---
+- name: Check whether paru is installed
+  ansible.builtin.command:
+    cmd: paru --version
+  register: hyprland_paru
+  changed_when: false
+  failed_when: false
+
+- name: Create the unprivileged AUR build user
+  become: true
+  ansible.builtin.user:
+    name: "{{ hyprland_aur_builder_user }}"
+    create_home: true
+    shell: /bin/bash
+    state: present
+
+- name: Allow the AUR build user to install built packages
+  become: true
+  community.general.sudoers:
+    name: aur-builder-pacman
+    user: "{{ hyprland_aur_builder_user }}"
+    commands:
+      - /usr/bin/pacman
+    nopassword: true
+    state: present
+
+- name: Install Paru build dependencies
+  become: true
+  community.general.pacman:
+    name:
+      - base-devel
+      - git
+    state: present
+  when: hyprland_paru.rc != 0
+
+- name: Create the Paru build directory
+  become: true
+  become_user: "{{ hyprland_aur_builder_user }}"
+  ansible.builtin.file:
+    path: "{{ hyprland_paru_build_dir | dirname }}"
+    state: directory
+    mode: "0755"
+  when: hyprland_paru.rc != 0
+
+- name: Download the paru-bin PKGBUILD
+  become: true
+  become_user: "{{ hyprland_aur_builder_user }}"
+  ansible.builtin.git:
+    repo: https://aur.archlinux.org/paru-bin.git
+    dest: "{{ hyprland_paru_build_dir }}"
+    version: master
+    update: true
+  when: hyprland_paru.rc != 0
+
+- name: Build paru-bin
+  become: true
+  become_user: "{{ hyprland_aur_builder_user }}"
+  ansible.builtin.command:
+    cmd: makepkg --clean --cleanbuild --noconfirm
+    chdir: "{{ hyprland_paru_build_dir }}"
+  changed_when: true
+  when: hyprland_paru.rc != 0
+
+- name: Find the built paru-bin package
+  become: true
+  become_user: "{{ hyprland_aur_builder_user }}"
+  ansible.builtin.command:
+    cmd: makepkg --packagelist
+    chdir: "{{ hyprland_paru_build_dir }}"
+  register: hyprland_paru_package_files
+  changed_when: false
+  when: hyprland_paru.rc != 0
+
+- name: Install the built paru-bin package
+  become: true
+  community.general.pacman:
+    name: "{{ hyprland_paru_package_files.stdout_lines }}"
+    state: present
+  when: hyprland_paru.rc != 0
+
+- name: Check Hyprland workstation package installation
+  become: false
+  ansible.builtin.command:
+    argv:
+      - pacman
+      - -Q
+      - "{{ item }}"
+  loop: >-
+    {{
+      (
+        hyprland_session_packages
+        + hyprland_integration_packages
+        + hyprland_utility_packages
+        + hyprland_graphical_packages
+        + hyprland_selected_feature_packages
+      ) | unique
+    }}
+  loop_control:
+    label: "{{ item }}"
+  register: hyprland_package_status
+  changed_when: false
+  failed_when: false
+
+- name: Install missing Hyprland workstation packages with paru
+  become: true
+  become_user: "{{ hyprland_aur_builder_user }}"
+  ansible.builtin.command:
+    argv:
+      - paru
+      - --sync
+      - --needed
+      - --noconfirm
+      - "{{ item.item }}"
+  loop: "{{ hyprland_package_status.results }}"
+  loop_control:
+    label: "{{ item.item }}"
+  changed_when: true
+  when: item.rc != 0
