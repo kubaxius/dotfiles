@@ -1,6 +1,6 @@
----------------
+-----------------
 ---- WINDOWS ----
----------------
+-----------------
 
 -- See https://wiki.hypr.land/Configuring/Basics/Window-Rules/
 
@@ -37,7 +37,7 @@ hl.window_rule({
 -- overlayLayerRule:set_enabled(false)
 
 -- Firefox PIP
--- #TODO get this to follow size set in a variable
+-- #TODO get this to remember the size and location.
 hl.window_rule({
 	name = "firefox-pip",
 	match = { class = "firefox", title = "Picture-in-Picture" },
@@ -58,6 +58,10 @@ hl.window_rule({
 	center = true,
 	float = true,
 })
+
+---------------
+---- GAMES ----
+---------------
 
 -- Rimworld fullscreen
 hl.window_rule({
