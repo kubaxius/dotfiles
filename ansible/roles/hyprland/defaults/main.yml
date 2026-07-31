@@ -1,0 +1,88 @@
+---
+# Packages required to start and maintain the Hyprland session.
+hyprland_session_packages:
+  - hyprland
+  - hypridle
+  - hyprpaper # wallpaper
+  - waybar
+  - uwsm # systemd bridge
+  - hyprpolkitagent # graphical sudo
+  - swaync # notifications
+
+# Background services and desktop integration shared by every workstation.
+hyprland_integration_packages:
+  - pipewire # media server
+  - pipewire-audio
+  - pipewire-pulse
+  - wireplumber
+  - xdg-desktop-portal-hyprland
+  - xdg-desktop-portal-gtk
+  - networkmanager
+  - network-manager-applet
+  - xsettingsd
+
+# Command-line helpers used by the shared Hyprland and Waybar configuration.
+hyprland_utility_packages:
+  - wl-clipboard
+  - cliphist
+  - playerctl
+  - hyprshot
+  - satty
+  - rofimoji
+  - wtype
+  - noto-fonts-emoji
+  - otf-font-awesome
+  - ttf-nerd-fonts-symbols
+
+# User-facing applications referenced by modules/programs.lua and Waybar.
+hyprland_graphical_packages:
+  - firefox
+  - kitty
+  - dolphin
+  - rofi
+  - obsidian
+  - pavucontrol
+
+# The playbook maps the current host's `workstation_features` into this
+# role-scoped input.
+hyprland_workstation_features: []
+
+hyprland_feature_packages:
+  corsair:
+    - ckb-next
+  laptop:
+    - brightnessctl
+    - power-profiles-daemon
+  media_apps:
+    - flatpak
+
+hyprland_system_services:
+  - NetworkManager.service
+
+hyprland_feature_system_services:
+  corsair:
+    - ckb-next-daemon.service
+  laptop:
+    - power-profiles-daemon.service
+  media_apps: []
+
+hyprland_media_flatpaks:
+  - com.mastermindzh.tidal-hifi
+
+# Persistent user units supplied by the session packages. UWSM-created
+# transient scopes remain documented in the Hyprland notes.
+hyprland_user_services:
+  enable:
+    - hyprpaper.service
+    - hypridle.service
+    - waybar.service
+    - swaync.service
+    - hyprpolkitagent.service
+
+# Keep XDG autostart available to other desktop environments, but disable its
+# compositor-specific UWSM entry point for the Hyprland session.
+hyprland_user_targets:
+  unmask:
+    - xdg-desktop-autostart.target
+  mask:
+    - wayland-session-xdg-autostart@hyprland.desktop.target

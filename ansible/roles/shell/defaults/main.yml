@@ -1,0 +1,8 @@
+---
+shell_packages:
+  - zsh # shell
+  - fzf # fuzzy search
+  - tldr # shorter man pages, navi has support for it
+  - navi # snippet manager
+  - tmux # terminal multiplexer
+  - entr # allows running scripts on file change

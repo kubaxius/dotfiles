@@ -8,45 +8,8 @@ base_packages:
   - zsh
   - chezmoi
 
-shell_packages:
-  - zsh # shell
-  - fzf # fuzzy search
-  - tldr # shorter man pages, navi has support for it
-  - navi # snippet manager
-  - tmux # terminal multiplexer
-  - entr # allows running scripts on file change
-
-# Package names are currently Arch Linux names, matching this workstation's
-# Hyprland configuration.
-hyprland_session_packages:
-  - hyprland
-  - hypridle
-  - hyprpaper
-  - waybar
-  - uwsm # bridge for graphical user session and systemd
-  - hyprpolkitagent # the popup you get while something asks for sudo
-  - swaync # notification manager
-
-# Canonical inventory of persistent Hyprland systemd user units. `origin`
-# records who supplies a unit; `enabled` says whether this machine enables it.
-# UWSM-created transient scopes remain documented in the Hyprland notes.
-hyprland_user_services:
-  - name: hyprpaper.service
-    origin: package
-    enabled: true
-  - name: hypridle.service
-    origin: package
-    enabled: true
-  - name: waybar.service
-    origin: package
-    enabled: true
-  - name: swaync.service
-    origin: package
-    enabled: true
-  - name: hyprpolkitagent.service
-    origin: package
-    enabled: true
-
-hyprland_user_targets:
-  - name: xdg-desktop-autostart.target
-    masked: true
+# Optional additions enabled on this machine.
+# A typical laptop could instead use: [laptop, media_apps]
+workstation_features:
+  - corsair
+  - media_apps

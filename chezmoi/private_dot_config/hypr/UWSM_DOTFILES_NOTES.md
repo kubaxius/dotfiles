@@ -11,15 +11,18 @@ Hypridle screen-off wake issues, Waybar crashes, and UWSM startup behavior.
   - `hypridle.service`
   - `hyprpaper.service`
 - Keep Hypridle turning the screen off after 10 minutes.
-- Avoid UWSM/systemd launching the whole XDG autostart batch from Plasma/KDE.
+- Avoid UWSM/systemd launching the XDG autostart batch in Hyprland without
+  disabling XDG autostart in other desktop environments.
 
 ## Service Inventory
 
 The canonical list of persistent systemd user units is
-`ansible/host_vars/localhost.yml` under `hyprland_user_services`. Each entry
-records the unit's origin (`package` or `dotfiles-override`) and whether this
-machine enables it. Keep transient processes started by `uwsm.start*` in this
-note instead: they are scopes created on demand, not service files.
+`ansible/roles/hyprland/defaults/main.yml` under
+`hyprland_user_services.enable`. The target masks are under
+`hyprland_user_targets.mask`; shared targets that must remain available are
+under `hyprland_user_targets.unmask`. Keep transient processes started by
+`uwsm.start*` in this note instead: they are scopes created on demand, not
+service files.
 
 Use package-provided user units by default. A unit in
 `~/.config/systemd/user/` with the same name overrides the package unit in
@@ -92,15 +95,16 @@ User services enabled:
 systemctl --user enable waybar.service hypridle.service hyprpaper.service
 ```
 
-XDG autostart target masked for this user:
+UWSM's Hyprland-specific XDG autostart target is masked:
 
 ```sh
-systemctl --user mask xdg-desktop-autostart.target
+systemctl --user mask wayland-session-xdg-autostart@hyprland.desktop.target
 ```
 
-This mask stops UWSM/systemd from launching generated XDG autostart units such
-as KDE Connect, KAlarm, KGpg, print applet, pamac tray, OpenRGB, Obsidian, etc.
-It is user-wide, so it may affect Plasma autostart behavior for this same user.
+This stops UWSM from launching generated XDG autostart units such as KDE
+Connect, KAlarm, KGpg, print applet, pamac tray, OpenRGB, Obsidian, etc. in the
+Hyprland session. The shared `xdg-desktop-autostart.target` remains unmasked,
+so other desktop environments can still use normal XDG autostart.
 
 ## Useful Checks
 
@@ -122,7 +126,9 @@ Confirm services:
 
 ```sh
 systemctl --user is-active graphical-session.target waybar hypridle hyprpaper
-systemctl --user is-enabled waybar hypridle hyprpaper xdg-desktop-autostart.target
+systemctl --user is-enabled waybar hypridle hyprpaper \
+  xdg-desktop-autostart.target \
+  wayland-session-xdg-autostart@hyprland.desktop.target
 ```
 
 Expected:
@@ -135,6 +141,7 @@ active
 enabled
 enabled
 enabled
+static
 masked
 ```
 
@@ -160,14 +167,14 @@ chezmoi should own files under the home directory, especially:
 ```text
 ~/.config/hypr/
 ~/.config/waybar/
-~/.config/systemd/user/xdg-desktop-autostart.target -> /dev/null
+~/.config/systemd/user/wayland-session-xdg-autostart@hyprland.desktop.target -> /dev/null
 ```
 
 Ansible owns packages, user-service enablement, and the XDG-autostart target
 mask. The executable definitions are:
 
 ```text
-ansible/host_vars/localhost.yml
+ansible/roles/hyprland/defaults/main.yml
 ansible/roles/hyprland/tasks/main.yml
 ansible/roles/hyprland/tasks/user_services.yml
 ```

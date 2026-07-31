@@ -44,6 +44,13 @@
         "panel": "dedicated",
         "clear": true
       }
+    },
+    {
+      "type": "shell",
+      "label": "Run ansible setup",
+      "command": "ansible-playbook",
+      "args": ["-K", "-i ansible/inventory.yml", "ansible/playbook.yml"],
+      "problemMatcher": []
     }
   ],
   "inputs": [
