@@ -13,6 +13,7 @@ local M = {}
 ---- WORKSPACE 1 ----
 ---------------------
 hl.workspace_rule({
+	default_name = "Code 1",
 	workspace = "1",
 	persistent = true,
 })
@@ -24,6 +25,7 @@ end
 ---- WORKSPACE 2 ----
 ---------------------
 hl.workspace_rule({
+	default_name = "Code 2",
 	workspace = "2",
 	persistent = true,
 })
@@ -35,6 +37,7 @@ end
 ---- WORKSPACE 3 ----
 ---------------------
 hl.workspace_rule({
+	default_name = "Code 3",
 	workspace = "3",
 	persistent = true,
 })
@@ -46,6 +49,7 @@ end
 ---- WORKSPACE 4 ----
 ---------------------
 hl.workspace_rule({
+	default_name = "Discord",
 	workspace = "4",
 	persistent = true,
 })
@@ -57,6 +61,7 @@ end
 ---- WORKSPACE 5 - BROWSER ----
 -------------------------------
 hl.workspace_rule({
+	default_name = "Browser",
 	workspace = "5",
 	persistent = true,
 	default = true,
@@ -72,6 +77,7 @@ end
 ---- WORKSPACE 6 ----
 ---------------------
 hl.workspace_rule({
+	default_name = "Steam",
 	workspace = "6",
 	persistent = true,
 })
@@ -94,6 +100,7 @@ end
 ---- WORKSPACE 8 - NOTES ----
 -----------------------------
 hl.workspace_rule({
+	default_name = "Notes",
 	workspace = "8",
 	persistent = true,
 })
@@ -106,6 +113,7 @@ end
 ---- WORKSPACE 9 - MUSIC ----
 -----------------------------
 hl.workspace_rule({
+	default_name = "Music",
 	workspace = "9",
 	persistent = true,
 })
