@@ -7,102 +7,54 @@
   "spacing": 4, // Gaps between modules (4px)
   // Choose the order of the modules
   "modules-left": ["hyprland/workspaces", "custom/media"],
-  // TODO: Replace sway/window and sway/language with their Hyprland modules.
-  "modules-center": ["sway/window"],
+  "modules-center": ["hyprland/window"],
   "modules-right": [
-    "mpd",
-    "idle_inhibitor",
+    "mpris",
     "pulseaudio",
-    "network",
-    "power-profiles-daemon",
     "cpu",
     "memory",
     "temperature",
-    "backlight",
-    "keyboard-state",
-    "sway/language",
-    "battery",
-    "battery#bat2",
     "clock",
     "tray",
     "custom/power"
   ],
-  // Modules configuration
-  // "sway/workspaces": {
-  //     "disable-scroll": true,
-  //     "all-outputs": true,
-  //     "warp-on-scroll": false,
-  //     "format": "{name}: {icon}",
-  //     "format-icons": {
-  //         "1": "",
-  //         "2": "",
-  //         "3": "",
-  //         "4": "",
-  //         "5": "",
-  //         "urgent": "",
-  //         "focused": "",
-  //         "default": ""
-  //     }
-  // },
-  "keyboard-state": {
-    "numlock": true,
-    "capslock": true,
-    "format": "{name} {icon}",
+  //  Modules configuration
+  "hyprland/workspaces": {
+    "format": " {icon} ",
     "format-icons": {
-      "locked": "",
-      "unlocked": ""
+      "Code 1": "",
+      "Code 2": "",
+      "Code 3": "",
+      "Discord": "",
+      "Browser": "󰈹",
+      "Steam": "󰓓",
+      "7": "?",
+      "Notes": "󰠮",
+      "Music": "󰝚"
+      // "urgent": "",
+      // "focused": "",
+      // "default": ""
     }
   },
-  "sway/mode": {
-    "format": "<span style=\"italic\">{}</span>"
-  },
-  "sway/scratchpad": {
-    "format": "{icon} {count}",
-    "show-empty": false,
-    "format-icons": ["", ""],
-    "tooltip": true,
-    "tooltip-format": "{app}: {title}"
-  },
-  "mpd": {
-    "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}% ",
-    "format-disconnected": "Disconnected ",
-    "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
-    "unknown-tag": "N/A",
-    "interval": 5,
-    "consume-icons": {
-      "on": " "
+  "mpris": {
+    "player": "tidal-hifi",
+    "format": " {status_icon} {artist} — {title} ",
+    "format-paused": " {status_icon} {artist} — {title} ",
+    "status-icons": {
+      "playing": "",
+      "paused": "",
+      "stopped": ""
     },
-    "random-icons": {
-      "off": "<span color=\"#f53c3c\"></span> ",
-      "on": " "
-    },
-    "repeat-icons": {
-      "on": " "
-    },
-    "single-icons": {
-      "on": "1 "
-    },
-    "state-icons": {
-      "paused": "",
-      "playing": ""
-    },
-    "tooltip-format": "MPD (connected)",
-    "tooltip-format-disconnected": "MPD (disconnected)"
-  },
-  "idle_inhibitor": {
-    "format": "{icon}",
-    "format-icons": {
-      "activated": "",
-      "deactivated": ""
-    }
+    "dynamic-len": 50,
+    "tooltip-format": "{artist}\n{album}\n{title}"
   },
   "tray": {
-    // "icon-size": 21,
-    "spacing": 10
-    // "icons": {
-    //   "blueman": "bluetooth",
-    //   "TelegramDesktop": "$HOME/.local/share/icons/hicolor/16x16/apps/telegram.png"
-    // }
+    "icon-size": 21,
+    "spacing": 10,
+    "icons": {
+      "blueman": "bluetooth",
+      "TelegramDesktop": "$HOME/.local/share/icons/hicolor/16x16/apps/telegram.png"
+    }
   },
   "clock": {
     // "timezone": "America/New_York",
