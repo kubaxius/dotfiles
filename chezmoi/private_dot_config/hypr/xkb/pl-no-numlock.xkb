@@ -21,6 +21,10 @@ xkb_keymap {
 		replace key <KP3> { [ KP_3 ] };
 
 		replace key <KP0> { [ KP_0 ] };
+
+		// Use the numpad decimal key as a dedicated Hyper/Mod3 modifier.
+		// replace key <KPDL> { [ Hyper_L ] };
+		// modifier_map Mod3 { <KPDL> };
 	};
 	xkb_geometry { include "pc(pc105)" };
 };
