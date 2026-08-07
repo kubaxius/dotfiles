@@ -84,7 +84,7 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@field kill fun(): any
 ---@field float fun(options?: table): any
 ---@field pseudo fun(): any
----@field move fun(options: table): any
+---@field move fun(options: { workspace?: integer|string, follow?: boolean, direction?: string }): any
 ---@field drag fun(): any
 ---@field resize fun(): any
 
@@ -164,6 +164,7 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@field preserve_split? boolean
 
 ---@class HyprlandMasterConfig
+---@field mfact? number
 ---@field new_status? string
 
 ---@class HyprlandScrollingConfig
@@ -219,6 +220,7 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@field mouse? boolean
 ---@field locked? boolean
 ---@field repeating? boolean
+---@field release? boolean
 ---@field click? boolean
 ---@field drag? boolean
 ---@field device? HyprlandBindDeviceOptions
