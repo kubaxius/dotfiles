@@ -5,7 +5,7 @@ set -euo pipefail
 # Normalize the tiled windows on the active workspace to a screen-relative
 # grid. The master/slave split uses horizontal grid units, while boundaries
 # between windows in the same column use vertical grid units.
-# The grid dimensions are supplied by modules/layout-grid.lua. For example,
+# The grid dimensions are supplied by modules/layout.lua. For example,
 # 12 8 divides the usable workspace into 12 columns and 8 rows.
 grid_width="${1:-}"
 grid_height="${2:-}"
