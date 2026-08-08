@@ -1,5 +1,22 @@
--- Keep user-facing workspace numbers in numpad order while Hyprland stores
--- workspaces from top-left to bottom-right.
+---------------------------
+---- WORKSPACE MAPPING ----
+---------------------------
+
+-- HyprExpo lays out Hyprland's numeric workspace IDs in row-major order,
+-- starting at the top-left:
+--
+--     physical IDs          user-facing numbers
+--     1  2  3               7  8  9
+--     4  5  6               4  5  6
+--     7  8  9               1  2  3
+--
+-- The user-facing side follows a numpad: workspace 1 is the bottom-left tile,
+-- even though Hyprland and HyprExpo know that tile as workspace ID 7.
+--
+-- Treat user input and workspace sections as logical numbers. Convert them to
+-- physical IDs only at the Hyprland boundary (binds, rules, and dispatchers).
+-- Keeping the translation here gives the rest of the configuration one shared
+-- source of truth.
 local logical_to_physical = {
 	[1] = 7,
 	[2] = 8,
@@ -14,15 +31,33 @@ local logical_to_physical = {
 
 local M = {}
 
+---Converts a user-facing workspace number to Hyprland's physical workspace ID.
+---Numbers outside the mapped 1-9 grid pass through unchanged; for example,
+---logical workspace 10 remains physical workspace 10.
+---@param logical integer User-facing workspace number.
+---@return integer physical Hyprland workspace ID.
 function M.physical(logical)
 	return logical_to_physical[logical] or logical
 end
 
+---Builds a workspace selector for a rule or dispatcher.
+---The optional suffix supports selectors such as `7 silent` while ensuring the
+---numeric part is translated through the logical-to-physical map first.
+---@param logical integer User-facing workspace number.
+---@param suffix? string Selector suffix such as `silent`.
+---@return string selector Hyprland workspace selector.
 function M.selector(logical, suffix)
 	local selector = tostring(M.physical(logical))
 	return suffix and (selector .. " " .. suffix) or selector
 end
 
+---Builds HyprExpo's comma-separated label map in visible tile order.
+---HyprExpo consumes labels by physical position, so this inverts the mapping:
+---physical tiles 1-9 receive logical labels `7,8,9,4,5,6,1,2,3`.
+---This assumes the overview starts at physical workspace 1 and does not omit
+---tiles, as configured by `workspace_method` and `skip_empty`/`max_workspace`.
+---@param count integer Number of physical overview tiles to label.
+---@return string labels Comma-separated logical labels for HyprExpo.
 function M.hyprexpo_labels(count)
 	local labels = {}
 
