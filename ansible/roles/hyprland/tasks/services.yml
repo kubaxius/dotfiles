@@ -56,3 +56,17 @@
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
   tags:
     - hyprland-user-services
+
+- name: Enable Hyprland user targets
+  become: false
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: true
+    scope: user
+  loop: "{{ hyprland_user_targets.enable }}"
+  loop_control:
+    label: "{{ item }}"
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
+  tags:
+    - hyprland-user-services
