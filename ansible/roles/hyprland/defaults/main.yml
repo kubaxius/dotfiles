@@ -8,6 +8,7 @@ hyprland_session_packages:
   - uwsm # systemd bridge
   - hyprpolkitagent # graphical sudo
   - swaync # notifications
+  - hyprshutdown
 
 # Background services and desktop integration shared by every workstation.
 hyprland_integration_packages:
