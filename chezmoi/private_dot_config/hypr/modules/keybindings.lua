@@ -8,6 +8,7 @@ local uwsm = require("lib.uwsm")
 local keys = require("lib.keys")
 local notify = require("lib.notify")
 local submaps = require("lib.submaps")
+local workspaceMap = require("lib.workspace_map")
 local layoutGrid = require("modules.layout-grid")
 -- clear any stale config of the bind-blocks
 package.loaded["lib.bind-blocks"] = nil
@@ -68,13 +69,14 @@ end)
 defineBindBlock("numbered-workspaces", function()
 	for i = 1, 10 do
 		local key = i % 10 -- 10 maps to key 0
-		bind(modBind(tostring(key)), hl.dsp.focus({ workspace = i }))
-		bind(modBind("SHIFT + " .. key), hl.dsp.window.move({ workspace = i }))
+		local workspace = workspaceMap.physical(i)
+		bind(modBind(tostring(key)), hl.dsp.focus({ workspace = workspace }))
+		bind(modBind("SHIFT + " .. key), hl.dsp.window.move({ workspace = workspace }))
 	end
 end)
 
 defineBindBlock("special-workspace", function()
-	--bind(modBind("S"), hl.dsp.workspace.toggle_special("magic"))
+	bind(modBind("X"), hl.dsp.workspace.toggle_special("magic"))
 	bind(modBind("SHIFT + S"), hl.dsp.window.move({ workspace = "special:magic" }))
 end)
 
@@ -148,6 +150,9 @@ defineBindBlock("rimworld-mouse", function()
 end)
 
 defineBindBlock("numpad-workspaces", function()
+	bind("KP_Subtract", function()
+		hl.plugin.hyprexpo.expo("toggle")
+	end)
 	local keypadWorkspaces = {
 		{ workspace = 1, key = "KP_1" },
 		{ workspace = 2, key = "KP_2" },
@@ -161,8 +166,9 @@ defineBindBlock("numpad-workspaces", function()
 	}
 
 	for _, binding in ipairs(keypadWorkspaces) do
-		bind(binding.key, hl.dsp.focus({ workspace = binding.workspace }))
-		bind("SHIFT + " .. binding.key, hl.dsp.window.move({ workspace = binding.workspace, follow = false }))
+		local workspace = workspaceMap.physical(binding.workspace)
+		bind(binding.key, hl.dsp.focus({ workspace = workspace }))
+		bind("SHIFT + " .. binding.key, hl.dsp.window.move({ workspace = workspace, follow = false }))
 		--bind("MOD3 + " .. binding.key, hl.dsp.window.move({ workspace = binding.workspace, follow = false }))
 	end
 end, {
@@ -193,6 +199,18 @@ local universalBindBlocks = {
 }
 
 useBindBlocks(universalBindBlocks)
+
+defineSubmap("hyprexpo", function()
+	for i = 1, 9 do
+		local logicalWorkspace = i
+		local function selectWorkspace()
+			hl.plugin.hyprexpo.kb_selecti(workspaceMap.physical(logicalWorkspace))
+		end
+
+		bind(tostring(logicalWorkspace), selectWorkspace)
+		bind("KP_" .. logicalWorkspace, selectWorkspace)
+	end
+end)
 
 defineSubmap("RimWorld", {
 	function()

@@ -21,16 +21,17 @@
   //  Modules configuration
   "hyprland/workspaces": {
     "format": " {icon} ",
+    "sort-by": "name",
     "format-icons": {
-      "Code 1": "",
-      "Code 2": "",
-      "Code 3": "",
-      "Discord": "",
-      "Browser": "󰈹",
-      "Steam": "󰓓",
+      "1 Code 1": "",
+      "2 Code 2": "",
+      "3 Code 3": "",
+      "4 Discord": "",
+      "5 Browser": "󰈹",
+      "6 Steam": "󰓓",
       "7": "?",
-      "Notes": "󰠮",
-      "Music": "󰝚"
+      "8 Notes": "󰠮",
+      "9 Music": "󰝚"
       // "urgent": "",
       // "focused": "",
       // "default": ""

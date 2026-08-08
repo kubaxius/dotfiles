@@ -4,6 +4,28 @@
 
 local programs = require("modules.programs")
 local uwsm = require("lib.uwsm")
+local workspaceMap = require("lib.workspace_map")
+
+hl.config({
+	plugin = {
+		hyprexpo = {
+			columns = 3,
+			gaps_in = 5,
+			gaps_out = 0,
+			bg_col = "rgb(111111)",
+			workspace_method = "first 1",
+			max_workspace = 9,
+			label_text_mode = "token",
+			label_token_map = workspaceMap.hyprexpo_labels(9),
+			label_position = "center",
+			show_workspace_numbers = 0,
+			number_key_mode = "passthrough",
+			gesture_distance = 200,
+			cancel_key = "escape",
+			show_cursor = 1,
+		},
+	},
+})
 
 local M = {}
 
@@ -13,8 +35,8 @@ local M = {}
 ---- WORKSPACE 1 ----
 ---------------------
 hl.workspace_rule({
-	default_name = "Code 1",
-	workspace = "1",
+	default_name = "1 Code 1",
+	workspace = workspaceMap.selector(1),
 	persistent = true,
 })
 local function setup_workspace_1()
@@ -25,8 +47,8 @@ end
 ---- WORKSPACE 2 ----
 ---------------------
 hl.workspace_rule({
-	default_name = "Code 2",
-	workspace = "2",
+	default_name = "2 Code 2",
+	workspace = workspaceMap.selector(2),
 	persistent = true,
 })
 local function setup_workspace_2()
@@ -37,8 +59,8 @@ end
 ---- WORKSPACE 3 ----
 ---------------------
 hl.workspace_rule({
-	default_name = "Code 3",
-	workspace = "3",
+	default_name = "3 Code 3",
+	workspace = workspaceMap.selector(3),
 	persistent = true,
 })
 local function setup_workspace_3()
@@ -49,8 +71,8 @@ end
 ---- WORKSPACE 4 ----
 ---------------------
 hl.workspace_rule({
-	default_name = "Discord",
-	workspace = "4",
+	default_name = "4 Discord",
+	workspace = workspaceMap.selector(4),
 	persistent = true,
 })
 local function setup_workspace_4()
@@ -61,24 +83,24 @@ end
 ---- WORKSPACE 5 - BROWSER ----
 -------------------------------
 hl.workspace_rule({
-	default_name = "Browser",
-	workspace = "5",
+	default_name = "5 Browser",
+	workspace = workspaceMap.selector(5),
 	persistent = true,
 	default = true,
 })
 local function setup_workspace_5()
 	-- Make default
-	hl.dispatch(hl.dsp.focus({ workspace = 5 }))
+	hl.dispatch(hl.dsp.focus({ workspace = workspaceMap.physical(5) }))
 	-- Programs to launch
-	uwsm.start_with_rules(programs.browser, "firefox", { workspace = "5 silent" })
+	uwsm.start_with_rules(programs.browser, "firefox", { workspace = workspaceMap.selector(5, "silent") })
 end
 
 ---------------------
 ---- WORKSPACE 6 ----
 ---------------------
 hl.workspace_rule({
-	default_name = "Steam",
-	workspace = "6",
+	default_name = "6 Steam",
+	workspace = workspaceMap.selector(6),
 	persistent = true,
 })
 local function setup_workspace_6()
@@ -89,7 +111,8 @@ end
 ---- WORKSPACE 7 ----
 ---------------------
 hl.workspace_rule({
-	workspace = "7",
+	default_name = "7",
+	workspace = workspaceMap.selector(7),
 	persistent = true,
 })
 local function setup_workspace_7()
@@ -100,21 +123,24 @@ end
 ---- WORKSPACE 8 - NOTES ----
 -----------------------------
 hl.workspace_rule({
-	default_name = "Notes",
-	workspace = "8",
+	default_name = "8 Notes",
+	workspace = workspaceMap.selector(8),
 	persistent = true,
 })
 local function setup_workspace_8()
 	-- Programs to launch
-	uwsm.start_with_rules(programs.notes, "obsidian", { workspace = "8 silent", render_unfocused = true })
+	uwsm.start_with_rules(programs.notes, "obsidian", {
+		workspace = workspaceMap.selector(8, "silent"),
+		render_unfocused = true,
+	})
 end
 
 -----------------------------
 ---- WORKSPACE 9 - MUSIC ----
 -----------------------------
 hl.workspace_rule({
-	default_name = "Music",
-	workspace = "9",
+	default_name = "9 Music",
+	workspace = workspaceMap.selector(9),
 	persistent = true,
 })
 
@@ -124,7 +150,7 @@ hl.window_rule({
 		class = "^com\\.mastermindzh\\.tidal-hifi$",
 	},
 
-	workspace = "9 silent",
+	workspace = workspaceMap.selector(9, "silent"),
 	render_unfocused = true,
 })
 
