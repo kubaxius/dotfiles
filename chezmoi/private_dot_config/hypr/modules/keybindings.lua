@@ -3,6 +3,7 @@
 ---------------------
 
 local programs = require("modules.programs")
+local scripts_dir = programs.scripts_dir
 local uwsm = require("lib.uwsm")
 local keys = require("lib.keys")
 local notify = require("lib.notify")
@@ -27,7 +28,7 @@ local function defineSubmap(name, blocks, resetTo, callback)
 end
 
 -- Universal bind to choose or reset submaps from anywhere.
-bind(mainMod .. " + SHIFT + escape", uwsm.raw("~/.config/hypr/scripts/hypr-submap-menu"), { submap_universal = true })
+bind(mainMod .. " + SHIFT + escape", uwsm.raw(scripts_dir .. "rofi-submap-menu"), { submap_universal = true })
 
 ---------------------------
 ---- KEYBINDING BLOCKS ----
@@ -50,7 +51,7 @@ defineBindBlock("windows", function()
 	bind(modBind("SHIFT + F"), hl.dsp.window.float({ action = "toggle" }))
 	bind(modBind("F"), uwsm.raw([[hyprctl dispatch 'hl.dsp.window.fullscreen({"fullscreen", "toggle"})']]))
 	-- TODO: Make this work
-	-- bind(modBind("SHIFT + P"), uwsm.raw("~/.config/hypr/scripts/hypr-make-pip"))
+	-- bind(modBind("SHIFT + P"), uwsm.raw(scripts_dir .. "hypr-make-pip"))
 	bind(modBind("P"), hl.dsp.window.pseudo())
 	bind(modBind("S"), hl.dsp.layout("swapwithmaster child ignoremaster")) -- master layout only
 	bind(modBind("J"), hl.dsp.layout("togglesplit")) -- dwindle layout only
@@ -84,7 +85,6 @@ defineBindBlock("workspace-scroll", function()
 end)
 
 defineBindBlock("macro-keys", function()
-	bind("XF86Tools", uwsm.raw("~/.config/hypr/scripts/hypr-submap-menu"))
 	bind("XF86Launch7", uwsm.exec(programs.fileManager))
 	bind("XF86Launch8", uwsm.exec(programs.terminal))
 	bind("XF86Launch9", uwsm.exec(programs.menu))
@@ -132,7 +132,7 @@ defineBindBlock("hypr-tools", function()
 end)
 
 defineBindBlock("clipboard", function()
-	bind(modBind("V"), uwsm.raw("~/.config/hypr/scripts/cliphist-copy"))
+	bind(modBind("V"), uwsm.raw("rofi-cliphist"))
 end)
 defineBindBlock("rimworld-mouse", function()
 	bind("1", hl.dsp.send_shortcut({ mods = "", key = "F1" }), { device = { list = { "naga" } } })

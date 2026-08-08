@@ -4,6 +4,7 @@
 
 -- Set programs that you use
 local programs = {
+	scripts_dir = "~/.config/hypr/scripts/",
 	terminal = "kitty",
 	fileManager = "dolphin",
 	menu_old = "hyprlauncher",
