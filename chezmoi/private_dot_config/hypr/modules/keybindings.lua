@@ -36,6 +36,7 @@ bind(mainMod .. " + SHIFT + escape", uwsm.raw(scripts_dir .. "rofi-submap-menu")
 
 defineBindBlock("launchers", function()
 	bind(modBind("Q"), uwsm.exec(programs.terminal))
+	-- TODO: Implement a shutdown menu
 	bind(modBind("M"), uwsm.stop())
 	bind(modBind("E"), uwsm.exec(programs.fileManager))
 	bind(modBind("R"), uwsm.exec(programs.menu))
