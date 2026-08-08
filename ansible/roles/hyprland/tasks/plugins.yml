@@ -1,0 +1,206 @@
+---
+# hyprpm keeps each user's plugin state and compiled shared objects under
+# /var/cache/hyprpm/<username>, but deliberately makes that cache root-owned.
+# Plugins are native code loaded directly into Hyprland, so root ownership
+# prevents another process running as the desktop user from replacing an
+# approved .so before the next reload. The plugin selection is still per-user;
+# only the cached artifacts and state are protected by root ownership.
+#
+# hyprpm performs the privileged cache operations itself by calling sudo. An
+# Ansible command has no interactive terminal where that nested sudo can ask
+# for a password, so the blocks below temporarily authorize only the helpers
+# hyprpm uses. Header installation is the exception to the simple file helpers:
+# hyprpm runs its generated `make installheaders && chmod && find` pipeline via
+# a root /bin/sh. The shell permission is therefore intentionally short-lived
+# and is removed by an `always` section, including when a plugin build or
+# installation fails. The grant is created only when the read-only preflight
+# finds a missing repository, a disabled plugin, or uninitialized state. Do not
+# run hyprpm itself with `become`: it rejects execution as root and would no
+# longer operate on the login user's plugin state.
+- name: Configure Hyprland plugins
+  when: hyprland_plugins | length > 0
+  tags:
+    - hyprland-plugins
+  block:
+    - name: Read installed Hyprland plugins
+      become: false
+      ansible.builtin.command:
+        argv:
+          - hyprpm
+          - list
+      register: hyprland_plugin_state
+      changed_when: false
+      failed_when: false
+
+    - name: Record missing Hyprland plugin repositories
+      ansible.builtin.set_fact:
+        hyprland_missing_plugin_repositories: >-
+          {{
+            hyprland_plugins
+            | rejectattr(
+                'repository_name',
+                'in',
+                hyprland_plugin_state.stdout
+              )
+            | list
+          }}
+
+    - name: Initialize disabled Hyprland plugin list
+      ansible.builtin.set_fact:
+        hyprland_disabled_plugins: []
+
+    - name: Check whether configured Hyprland plugins are enabled
+      ansible.builtin.set_fact:
+        hyprland_disabled_plugins: >-
+          {{
+            hyprland_disabled_plugins + [item]
+          }}
+      loop: "{{ hyprland_plugins }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: >-
+        hyprland_plugin_state.stdout
+        | regex_search(
+            'Plugin\\s+' ~ (item.name | regex_escape)
+            ~ '[^\\n]*\\n[^\\n]*enabled:[^\\n]*true'
+          )
+        is none
+
+    - name: Record whether Hyprland plugin reconciliation is required
+      ansible.builtin.set_fact:
+        hyprland_plugin_reconciliation_required: >-
+          {{
+            hyprland_plugin_state.rc != 0
+            or hyprland_missing_plugin_repositories | length > 0
+            or hyprland_disabled_plugins | length > 0
+          }}
+
+    - name: Reconcile Hyprland plugin configuration
+      when: hyprland_plugin_reconciliation_required
+      block:
+        - name: Allow hyprpm to manage its root-owned cache
+          become: true
+          community.general.sudoers:
+            name: ansible-hyprpm-cache
+            user: "{{ ansible_facts['user_id'] }}"
+            commands:
+              - /bin/sh
+              - /usr/bin/echo
+              - /usr/bin/install
+              - /usr/bin/mkdir
+              - /usr/bin/rm
+            nopassword: true
+            state: present
+
+        - name: Refresh installed Hyprland plugin state
+          become: false
+          ansible.builtin.command:
+            argv:
+              - hyprpm
+              - list
+          register: hyprland_reconciled_plugin_state
+          changed_when: false
+
+        - name: Record missing Hyprland plugin repositories after initialization
+          ansible.builtin.set_fact:
+            hyprland_missing_plugin_repositories: >-
+              {{
+                hyprland_plugins
+                | rejectattr(
+                    'repository_name',
+                    'in',
+                    hyprland_reconciled_plugin_state.stdout
+                  )
+                | list
+              }}
+
+        - name: Prepare Hyprland headers and update existing plugins
+          become: false
+          ansible.builtin.command:
+            argv:
+              - hyprpm
+              - update
+          when: hyprland_missing_plugin_repositories | length > 0
+          changed_when: true
+
+        - name: Add Hyprland plugin repositories
+          become: false
+          ansible.builtin.command:
+            argv:
+              - hyprpm
+              - add
+              - "{{ item.repository }}"
+          loop: "{{ hyprland_missing_plugin_repositories }}"
+          loop_control:
+            label: "{{ item.repository_name }}"
+          changed_when: true
+
+        - name: Refresh installed Hyprland plugin state after installation
+          become: false
+          ansible.builtin.command:
+            argv:
+              - hyprpm
+              - list
+          register: hyprland_reconciled_plugin_state
+          changed_when: false
+
+        - name: Enable Hyprland plugins
+          become: false
+          ansible.builtin.command:
+            argv:
+              - hyprpm
+              - enable
+              - "{{ item.name }}"
+          loop: "{{ hyprland_plugins }}"
+          loop_control:
+            label: "{{ item.name }}"
+          when: >-
+            hyprland_reconciled_plugin_state.stdout
+            | regex_search(
+                'Plugin\\s+' ~ (item.name | regex_escape)
+                ~ '[^\\n]*\\n[^\\n]*enabled:[^\\n]*true'
+              )
+            is none
+          changed_when: true
+
+      always:
+        - name: Remove hyprpm cache-management permission
+          become: true
+          community.general.sudoers:
+            name: ansible-hyprpm-cache
+            state: absent
+
+- name: Update Hyprland plugins on request
+  when: hyprland_plugins | length > 0
+  tags:
+    - never
+    - hyprland-plugin-update
+  block:
+    - name: Allow hyprpm to update its root-owned cache
+      become: true
+      community.general.sudoers:
+        name: ansible-hyprpm-cache-update
+        user: "{{ ansible_facts['user_id'] }}"
+        commands:
+          - /bin/sh
+          - /usr/bin/echo
+          - /usr/bin/install
+          - /usr/bin/mkdir
+          - /usr/bin/rm
+        nopassword: true
+        state: present
+
+    - name: Update installed Hyprland plugins
+      become: false
+      ansible.builtin.command:
+        argv:
+          - hyprpm
+          - update
+      changed_when: true
+
+  always:
+    - name: Remove hyprpm cache-update permission
+      become: true
+      community.general.sudoers:
+        name: ansible-hyprpm-cache-update
+        state: absent

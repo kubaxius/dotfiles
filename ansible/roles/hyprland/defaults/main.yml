@@ -46,6 +46,22 @@ hyprland_graphical_packages:
   - pavucontrol
   - kdeconnect
 
+# Build tools used by hyprpm when compiling plugins against the installed
+# Hyprland version.
+hyprland_plugin_build_packages:
+  - cpio
+  - cmake
+  - gcc
+  - git
+  - meson
+
+# Plugins are shared by every Hyprland workstation. `repository_name` is the
+# name shown by `hyprpm list`, while `name` is the plugin to enable.
+hyprland_plugins:
+  - name: hyprexpo
+    repository_name: hyprexpo
+    repository: https://github.com/sandwichfarm/hyprexpo
+
 # The playbook maps the current host's `workstation_features` into this
 # role-scoped input.
 hyprland_workstation_features: []

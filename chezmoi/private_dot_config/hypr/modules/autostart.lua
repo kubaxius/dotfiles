@@ -11,6 +11,8 @@ local workspaces = require("modules.workspaces")
 -- Most of these should be started by systemd, so prefer creating user scoped unit files and not using this file.
 hl.on("hyprland.start", function()
 	hl.env("XDG_MENU_PREFIX", "arch-")
+	-- Ensure plugins are loaded
+	uwsm.start_raw("hyprpm reload")
 	uwsm.start_raw(
 		"dbus-update-activation-environment --systemd "
 			.. "WAYLAND_DISPLAY DISPLAY "

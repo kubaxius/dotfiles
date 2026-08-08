@@ -70,6 +70,7 @@
             + hyprland_integration_packages
             + hyprland_utility_packages
             + hyprland_graphical_packages
+            + hyprland_plugin_build_packages
             + hyprland_selected_feature_packages
           ) | unique
         }}
