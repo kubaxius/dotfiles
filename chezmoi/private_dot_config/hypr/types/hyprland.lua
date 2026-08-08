@@ -4,6 +4,7 @@
 
 ---@class HyprlandLua
 ---@field dsp HyprlandDispatch
+---@field plugin HyprlandPlugins
 local HyprlandLua = {}
 
 ---@param monitor HyprlandMonitor
@@ -106,6 +107,7 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@field scale string
 
 ---@class HyprlandConfig
+---@field plugin? HyprlandPluginConfig
 ---@field ecosystem? HyprlandEcosystemConfig
 ---@field general? HyprlandGeneralConfig
 ---@field decoration? HyprlandDecorationConfig
@@ -116,6 +118,108 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@field misc? HyprlandMiscConfig
 ---@field input? HyprlandInputConfig
 ---@field xwayland? HyprlandXwaylandConfig
+
+---@class HyprlandPlugins
+---@field hyprexpo HyprExpo
+
+---@class HyprExpo
+---@field expo fun(action?: "toggle"|"on"|"enable"|"off"|"disable"|"cancel"|"select"|"bring"|string)
+---@field kb_focus fun(direction: "left"|"right"|"up"|"down")
+---@field kb_confirm fun()
+---@field kb_selecti fun(index: integer|string)
+---@field kb_selectn fun(workspace: integer|string)
+---@field kb_select fun(token: string)
+---@field move_window fun(spec: string)
+---@field gesture fun(options: HyprExpoGesture)
+
+---@class HyprExpoGesture
+---@field fingers integer
+---@field direction string
+---@field action? "expo"|"unset"
+---@field mods? string
+---@field scale? number
+---@field disable_inhibit? boolean
+
+---@class HyprlandPluginConfig
+---@field hyprexpo? HyprExpoConfig
+
+---@alias HyprlandBoolInt boolean|integer
+---@alias HyprlandColor integer|string
+
+---@class HyprExpoConfig
+---@field columns? integer
+---@field gaps_in? integer
+---@field gaps_out? integer
+---@field bg_col? HyprlandColor
+---@field workspace_method? string
+---@field skip_empty? HyprlandBoolInt
+---@field max_workspace? integer
+---@field gesture_distance? integer
+---@field cancel_key? string
+---@field show_cursor? HyprlandBoolInt
+---@field show_pinned_windows? HyprlandBoolInt
+---@field tile_rounding? integer
+---@field tile_rounding_power? number
+---@field tile_rounding_focus? integer
+---@field tile_rounding_current? integer
+---@field tile_rounding_hover? integer
+---@field border_width? integer
+---@field border_color? string
+---@field border_color_current? string
+---@field border_color_focus? string
+---@field border_color_hover? string
+---@field border_grad_current? string Deprecated; use `border_color_current`.
+---@field border_grad_focus? string Deprecated; use `border_color_focus`.
+---@field border_grad_hover? string Deprecated; use `border_color_hover`.
+---@field border_style? string Deprecated; inferred from the color format.
+---@field drag_drop_proxy_color? HyprlandColor
+---@field drag_drop_proxy_active_color? HyprlandColor
+---@field drag_drop_proxy_border_color? string
+---@field drag_drop_proxy_border_width? integer
+---@field drag_drop_proxy_rounding? integer
+---@field drag_drop_source_border_color? string
+---@field drag_drop_source_border_width? integer
+---@field label_enable? HyprlandBoolInt
+---@field label_color? HyprlandColor
+---@field label_text_mode? "token"|"index"|"id"
+---@field label_token_map? string
+---@field label_position? "top-left"|"top-right"|"bottom-left"|"bottom-right"|"center"
+---@field label_offset_x? integer
+---@field label_offset_y? integer
+---@field label_show? "always"|"hover"|"focus"|"hover+focus"|"current+focus"|"never"
+---@field label_color_default? HyprlandColor
+---@field label_color_hover? HyprlandColor
+---@field label_color_focus? HyprlandColor
+---@field label_color_current? HyprlandColor
+---@field show_workspace_numbers? HyprlandBoolInt
+---@field workspace_number_color? HyprlandColor
+---@field label_scale_hover? number
+---@field label_scale_focus? number
+---@field label_font_size? integer
+---@field label_font_family? string
+---@field label_font_bold? HyprlandBoolInt
+---@field label_font_italic? HyprlandBoolInt
+---@field label_text_underline? HyprlandBoolInt
+---@field label_text_strikethrough? HyprlandBoolInt
+---@field label_pixel_snap? HyprlandBoolInt
+---@field label_center_adjust_x? integer
+---@field label_center_adjust_y? integer
+---@field label_bg_enable? HyprlandBoolInt
+---@field label_bg_color? HyprlandColor
+---@field label_bg_shape? "circle"|"square"|"rounded"
+---@field label_bg_rounding? integer
+---@field label_padding? integer
+---@field selection_label_enable? HyprlandBoolInt
+---@field selection_label_token_map? string
+---@field selection_label_position? "top-left"|"top-right"|"bottom-left"|"bottom-right"|"center"
+---@field selection_label_offset_x? integer
+---@field selection_label_offset_y? integer
+---@field selection_label_color? HyprlandColor
+---@field keynav_enable? HyprlandBoolInt
+---@field number_key_mode? "workspace"|"index"|"passthrough"
+---@field keynav_wrap_h? HyprlandBoolInt
+---@field keynav_wrap_v? HyprlandBoolInt
+---@field keynav_reading_order? HyprlandBoolInt
 
 ---@class HyprlandEcosystemConfig
 ---@field enforce_permissions? boolean
