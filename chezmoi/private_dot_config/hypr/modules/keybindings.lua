@@ -132,7 +132,7 @@ defineBindBlock("hypr-tools", function()
 end)
 
 defineBindBlock("clipboard", function()
-	bind(modBind("V"), uwsm.raw("rofi-cliphist"))
+	bind(modBind("V"), uwsm.raw(scripts_dir .. "rofi-cliphist"))
 end)
 defineBindBlock("rimworld-mouse", function()
 	bind("1", hl.dsp.send_shortcut({ mods = "", key = "F1" }), { device = { list = { "naga" } } })
