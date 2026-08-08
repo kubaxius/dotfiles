@@ -161,7 +161,8 @@ defineBindBlock("numpad-workspaces", function()
 
 	for _, binding in ipairs(keypadWorkspaces) do
 		bind(binding.key, hl.dsp.focus({ workspace = binding.workspace }))
-		bind("SHIFT + " .. binding.key, hl.dsp.window.move({ workspace = binding.workspace }))
+		bind("SHIFT + " .. binding.key, hl.dsp.window.move({ workspace = binding.workspace, follow = false }))
+		--bind("MOD3 + " .. binding.key, hl.dsp.window.move({ workspace = binding.workspace, follow = false }))
 	end
 end, {
 	bind = "code:77",
