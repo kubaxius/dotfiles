@@ -26,4 +26,4 @@
   become: false
   ansible.builtin.command:
     cmd: "chezmoi apply --source {{ chezmoi_source_dir | quote }} --verbose"
-  changed_when: true
+  changed_when: chezmoi_diff.stdout | length > 0
