@@ -51,7 +51,7 @@ hyprland_workstation_features: []
 
 hyprland_feature_packages:
   corsair:
-    - ckb-next
+    - ckb-next-git
   razer:
     - openrazer-daemon
   laptop:
