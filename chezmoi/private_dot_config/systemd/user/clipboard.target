@@ -1,0 +1,9 @@
+[Unit]
+Description=Clipboard management
+PartOf=graphical-session.target
+Wants=wl-clip-persist.service
+Wants=cliphist-watch@text.service
+Wants=cliphist-watch@image.service
+
+[Install]
+WantedBy=graphical-session.target

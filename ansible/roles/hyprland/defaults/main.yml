@@ -112,3 +112,5 @@ hyprland_user_targets:
     - xdg-desktop-autostart.target
   mask:
     - wayland-session-xdg-autostart@hyprland.desktop.target
+  enable:
+    - clipboard.target

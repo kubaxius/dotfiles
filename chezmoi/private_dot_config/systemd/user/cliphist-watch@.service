@@ -1,0 +1,11 @@
+[Unit]
+Description=Clipboard history watcher for %i
+PartOf=clipboard.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wl-paste --type %i --watch /usr/bin/cliphist store
+Restart=on-failure
+RestartSec=1
