@@ -23,7 +23,7 @@ hyprland_integration_packages:
 
 # Command-line helpers used by the shared Hyprland and Waybar configuration.
 hyprland_utility_packages:
-  - jq
+  - jq # shell json support
   - wl-clipboard
   - cliphist
   - playerctl
@@ -76,7 +76,8 @@ hyprland_feature_system_services:
   media_apps: []
 
 hyprland_feature_user_services:
-  corsair: []
+  corsair:
+    - ckb-next.service
   razer:
     - openrazer-daemon.service
   laptop: []
