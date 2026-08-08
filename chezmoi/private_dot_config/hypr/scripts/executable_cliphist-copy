@@ -1,13 +1,20 @@
 #!/bin/sh
+# exit on fail or missing variable
 set -eu
 
+# It stores the thing you selected in rofi in the "selection" variable.
 selection="$(cliphist list | rofi -dmenu -display-columns 2 -p "Clipboard")"
+# Square bracket is "test". -n tests length of variable, if it's non-zero returns true.
 [ -n "$selection" ] || exit 0
 
+# $$ is the process ID.
 tmp="${TMPDIR:-/tmp}/cliphist-copy.$$"
+# "trap" says "If the script exits, do this.".
 trap 'rm -f "$tmp"' EXIT HUP INT TERM
 
+# Decode and save the selection to temp file.
 printf '%s\n' "$selection" | cliphist decode > "$tmp"
+# So we can find out it's MIME type.
 mime="$(file --brief --mime-type "$tmp" 2>/dev/null || true)"
 
 case "$mime" in
@@ -18,9 +25,12 @@ case "$mime" in
 		wl-copy --type text/plain < "$tmp"
 		;;
 	*)
+		# Do the file contains non-text-like bytes?
 		if LC_ALL=C grep -q '[^[:print:][:space:]]' "$tmp"; then
+			# Use the mime variable, or "application/octet-stream" as a type.
 			wl-copy --type "${mime:-application/octet-stream}" < "$tmp"
 		else
+			# Otherwise, it's a text file.
 			wl-copy --type text/plain < "$tmp"
 		fi
 		;;
