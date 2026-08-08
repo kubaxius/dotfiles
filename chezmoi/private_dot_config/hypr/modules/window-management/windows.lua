@@ -4,6 +4,16 @@
 
 -- See https://wiki.hypr.land/Configuring/Basics/Window-Rules/
 
+hl.config({
+	general = {
+		-- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Tearing/
+		allow_tearing = false,
+
+		-- Set to true to enable resizing windows by clicking and dragging on borders and gaps
+		resize_on_border = false,
+	},
+})
+
 local suppressMaximizeRule = hl.window_rule({
 	-- Ignore maximize requests from all apps. You'll probably like this.
 	name = "suppress-maximize-events",

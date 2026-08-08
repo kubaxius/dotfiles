@@ -3,6 +3,7 @@
 ---------------
 
 hl.config({
+
 	input = {
 		kb_file = "~/.config/hypr/xkb/pl-no-numlock.xkb",
 

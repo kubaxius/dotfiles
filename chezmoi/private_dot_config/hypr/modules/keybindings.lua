@@ -9,7 +9,7 @@ local keys = require("lib.keys")
 local notify = require("lib.notify")
 local submaps = require("lib.submaps")
 local workspaceMap = require("lib.workspace_map")
-local layoutGrid = require("modules.layout").grid
+local layoutGrid = require("modules.window-management.layout").grid
 -- clear any stale config of the bind-blocks
 package.loaded["lib.bind-blocks"] = nil
 local bindBlocks = require("lib.bind-blocks")

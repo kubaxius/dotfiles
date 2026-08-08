@@ -3,7 +3,7 @@
 -------------------
 
 local uwsm = require("lib.uwsm")
-local workspaces = require("modules.workspaces")
+local workspaces = require("modules.window-management.workspaces")
 
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
 
