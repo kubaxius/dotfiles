@@ -2,6 +2,8 @@
 ---- LOOK AND FEEL ----
 -----------------------
 
+local layoutGrid = require("modules.layout-grid")
+
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
 hl.config({
 	general = {
@@ -108,9 +110,9 @@ hl.config({
 -- See https://wiki.hypr.land/Configuring/Layouts/Master-Layout/ for more
 hl.config({
 	master = {
+		mfact = layoutGrid.initial_master_factor,
 		new_status = "slave",
-		orientation = "center",
-		slave_count_for_center_master = 6,
+		orientation = "left",
 		focus_master_on_close = false,
 	},
 })

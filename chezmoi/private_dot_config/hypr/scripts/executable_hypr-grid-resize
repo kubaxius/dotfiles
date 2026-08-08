@@ -1,0 +1,232 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Normalize the tiled windows on the active workspace to a screen-relative
+# grid. The master/slave split uses horizontal grid units, while boundaries
+# between windows in the same column use vertical grid units.
+# The grid dimensions are supplied by modules/layout-grid.lua. For example,
+# 12 8 divides the usable workspace into 12 columns and 8 rows.
+grid_width="${1:-}"
+grid_height="${2:-}"
+
+if ! [[ "$grid_width" =~ ^[1-9][0-9]*$ && "$grid_height" =~ ^[1-9][0-9]*$ ]]; then
+	printf 'Usage: %s GRID_WIDTH GRID_HEIGHT\n' "${0##*/}" >&2
+	exit 2
+fi
+
+command -v jq >/dev/null 2>&1 || {
+	printf '%s requires jq\n' "${0##*/}" >&2
+	exit 1
+}
+
+# Hyprland exposes the state needed by this script as JSON. The active window
+# is only needed as a compatibility fallback when activeworkspace does not
+# include its monitor ID.
+active_window="$(hyprctl -j activewindow)"
+active_workspace="$(hyprctl -j activeworkspace)"
+
+workspace_id="$(jq -r '.id // empty' <<<"$active_workspace")"
+monitor_id="$(jq -r '.monitorID // empty' <<<"$active_workspace")"
+layout="$(jq -r '.tiledLayout // empty' <<<"$active_workspace")"
+
+# Some Hyprland versions do not expose monitorID on activeworkspace.
+if [[ -z "$monitor_id" || "$monitor_id" == "null" ]]; then
+	monitor_id="$(jq -r '.monitor // empty' <<<"$active_window")"
+fi
+
+if [[ -z "$workspace_id" || -z "$monitor_id" ]]; then
+	exit 0
+fi
+
+# Find the monitor that owns the active workspace. Grid positions must be
+# calculated against this monitor rather than against the global desktop.
+monitor="$(hyprctl -j monitors | jq -c --argjson id "$monitor_id" '.[] | select(.id == $id)')"
+if [[ -z "$monitor" ]]; then
+	exit 0
+fi
+
+read -r monitor_x monitor_y monitor_width monitor_height monitor_scale transform reserved_left reserved_top reserved_right reserved_bottom < <(
+	jq -r '[.x, .y, .width, .height, .scale, .transform, .reserved[0], .reserved[1], .reserved[2], .reserved[3]] | @tsv' <<<"$monitor"
+)
+
+# Monitor dimensions are physical pixels, while client coordinates are logical
+# pixels. Quarter-turn transforms also swap the output's width and height.
+if (( transform % 2 == 1 )); then
+	tmp="$monitor_width"
+	monitor_width="$monitor_height"
+	monitor_height="$tmp"
+fi
+
+# Remove scaling and reserved areas such as Waybar. The resulting rectangle is
+# the actual tiling area and therefore the rectangle covered by the grid:
+#
+#   grid x = work_x + column * work_width  / grid_width
+#   grid y = work_y + row    * work_height / grid_height
+read -r work_x work_y work_width work_height < <(
+	awk -v mx="$monitor_x" -v my="$monitor_y" -v mw="$monitor_width" -v mh="$monitor_height" \
+		-v scale="$monitor_scale" -v left="$reserved_left" -v top="$reserved_top" \
+		-v right="$reserved_right" -v bottom="$reserved_bottom" 'BEGIN {
+		printf "%.0f %.0f %.0f %.0f\n", mx + left, my + top,
+			mw / scale - left - right, mh / scale - top - bottom
+	}'
+)
+
+workspace_clients() {
+	# Ignore floating, fullscreen, hidden, and off-workspace clients. They do
+	# not participate in the active tiled layout and must not affect its grid.
+	hyprctl -j clients | jq -c --argjson workspace "$workspace_id" '[
+		.[]
+		| select(
+			.workspace.id == $workspace
+			and .mapped
+			and .visible
+			and (.floating | not)
+			and .fullscreen == 0
+		)
+	]'
+}
+
+clients="$(workspace_clients)"
+tiled_count="$(jq 'length' <<<"$clients")"
+
+# A single tiled window should fill the work area. In particular, do not apply
+# the configured initial master width until a slave window actually exists.
+if (( tiled_count < 2 )); then
+	exit 0
+fi
+
+orientation="$(hyprctl -j getoption master:orientation | jq -r '.str // empty')"
+center_threshold="$(hyprctl -j getoption master:slave_count_for_center_master | jq -r '.int // 0')"
+fallback="$(hyprctl -j getoption master:center_master_fallback | jq -r '.str // "left"')"
+slave_count=$((tiled_count - 1))
+effective_orientation="$orientation"
+
+# A configured center layout may visually fall back to left or right until it
+# has enough slaves. Use what is actually visible when identifying the master.
+if [[ "$orientation" == "center" && "$center_threshold" =~ ^[0-9]+$ \
+	&& "$center_threshold" -gt 0 && "$slave_count" -lt "$center_threshold" ]]; then
+	effective_orientation="$fallback"
+fi
+
+# In the master layout, snap the master/slave split through mfact. This avoids
+# feeding decorated client geometry back into the layout and accumulating drift.
+if [[ "$layout" == "master" ]]; then
+	# Pick the tall window on the master side. For center orientation, choose
+	# the tall window whose horizontal center is closest to the work-area center.
+	master_width="$(
+		jq -r --arg orientation "$effective_orientation" --argjson center "$((work_x + work_width / 2))" '
+			if $orientation == "right" then
+				sort_by([(0 - .size[1]), (0 - .at[0])]) | first
+			elif $orientation == "center" then
+				sort_by([(((.at[0] + (.size[0] / 2)) - $center) | fabs), (0 - .size[1])]) | first
+			else
+				sort_by([(0 - .size[1]), .at[0]]) | first
+			end
+			| .size[0] // empty
+		' <<<"$clients"
+	)"
+
+	if [[ -n "$master_width" ]]; then
+		# Convert the current master width to the nearest horizontal grid unit:
+		#
+		#   units = round(master_width / work_width * grid_width)
+		#   mfact = units / grid_width
+		#
+		# Keep one grid unit available on each side of the split.
+		master_factor="$(
+			awk -v width="$master_width" -v extent="$work_width" -v cells="$grid_width" 'BEGIN {
+				units = int(width * cells / extent + 0.5)
+				if (units < 1) units = 1
+				if (units >= cells) units = cells - 1
+				printf "%.10f\n", units / cells
+			}'
+		)"
+		hyprctl dispatch "hl.dsp.layout(\"mfact exact $master_factor\")" >/dev/null
+	fi
+fi
+
+# Changing mfact changes window coordinates and widths, so discard the old
+# client snapshot before discovering the vertical columns.
+clients="$(workspace_clients)"
+
+# Windows with identical x coordinates and widths form a vertical column.
+# Sort each column from top to bottom and discard one-window columns because
+# they contain no internal boundary to normalize.
+columns="$(jq -c 'sort_by([.at[0], .at[1]]) | group_by([.at[0], .size[0]]) | map(sort_by(.at[1])) | map(select(length > 1))' <<<"$clients")"
+
+# Correct boundaries from top to bottom. Master layout resizing redistributes
+# space below the adjusted boundary, so this order preserves earlier snaps.
+while IFS= read -r column; do
+	window_count="$(jq 'length' <<<"$column")"
+
+	# Every window needs at least one grid row. If the column contains more
+	# windows than the grid has rows, a valid non-overlapping snap is impossible.
+	if (( window_count > grid_height )); then
+		continue
+	fi
+
+	for ((boundary_number = 1; boundary_number < window_count; boundary_number++)); do
+		# A boundary is represented by the window immediately above it and the
+		# window immediately below it. Addresses let us resize without changing
+		# keyboard focus.
+		upper_address="$(jq -r --argjson index "$((boundary_number - 1))" '.[$index].address' <<<"$column")"
+		lower_address="$(jq -r --argjson index "$boundary_number" '.[$index].address' <<<"$column")"
+
+		# A previous boundary resize may have redistributed the remaining space,
+		# so always use fresh geometry for the next boundary.
+		clients="$(workspace_clients)"
+
+		read -r upper_bottom lower_top < <(
+			jq -r --arg upper "$upper_address" --arg lower "$lower_address" '
+				(.[] | select(.address == $upper) | .at[1] + .size[1]) as $upperBottom
+				| (.[] | select(.address == $lower) | .at[1]) as $lowerTop
+				| [$upperBottom, $lowerTop] | @tsv
+			' <<<"$clients"
+		)
+
+		if [[ -z "${upper_bottom:-}" || -z "${lower_top:-}" ]]; then
+			continue
+		fi
+
+		# The conceptual boundary lies halfway through Hyprland's gap: the upper
+		# client ends on one side and the lower client begins on the other.
+		boundary=$(((upper_bottom + lower_top) / 2))
+
+		# Convert the boundary to the nearest grid row, then back to a logical
+		# pixel coordinate. Clamp the row so every window above and below retains
+		# at least one grid unit:
+		#
+		#   row = round((boundary - work_y) / work_height * grid_height)
+		#   target = work_y + row * work_height / grid_height
+		target_boundary="$(
+			awk -v boundary="$boundary" -v origin="$work_y" -v extent="$work_height" \
+				-v cells="$grid_height" -v minimum="$boundary_number" \
+				-v maximum="$((grid_height - (window_count - boundary_number)))" 'BEGIN {
+				grid_index = int((boundary - origin) * cells / extent + 0.5)
+				if (grid_index < minimum) grid_index = minimum
+				if (grid_index > maximum) grid_index = maximum
+				printf "%.0f\n", origin + grid_index * extent / cells
+			}'
+		)"
+
+		# Hyprland's tiled resize dispatcher accepts a relative pixel delta. The
+		# layout translates this into its internal per-window size percentages.
+		delta_y=$((target_boundary - boundary))
+		if (( delta_y == 0 )); then
+			continue
+		fi
+
+		selector="address:$upper_address"
+		if [[ "$layout" == "master" && "$orientation" == "center" \
+			&& "$effective_orientation" != "center" \
+			&& ( "$fallback" == "left" || "$fallback" == "right" ) ]]; then
+			# Hyprland 0.56.x uses center-column resize bookkeeping even while it
+			# visually renders the fallback layout. Resize using the real layout,
+			# then restore the configured orientation in the same IPC evaluation.
+			hyprctl eval "hl.config({ master = { orientation = \"$fallback\" } }); hl.dispatch(hl.dsp.window.resize({ x = 0, y = $delta_y, relative = true, window = \"$selector\" })); hl.config({ master = { orientation = \"center\" } })" >/dev/null
+		else
+			hyprctl dispatch "hl.dsp.window.resize({ x = 0, y = $delta_y, relative = true, window = \"$selector\" })" >/dev/null
+		fi
+	done
+done < <(jq -c '.[]' <<<"$columns")

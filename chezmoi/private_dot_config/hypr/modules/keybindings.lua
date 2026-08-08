@@ -7,6 +7,7 @@ local uwsm = require("lib.uwsm")
 local keys = require("lib.keys")
 local notify = require("lib.notify")
 local submaps = require("lib.submaps")
+local layoutGrid = require("modules.layout-grid")
 -- clear any stale config of the bind-blocks
 package.loaded["lib.bind-blocks"] = nil
 local bindBlocks = require("lib.bind-blocks")
@@ -92,6 +93,8 @@ end)
 defineBindBlock("mouse-controls", function()
 	bind(modBind("mouse:272"), hl.dsp.window.drag(), { mouse = true })
 	bind(modBind("mouse:273"), hl.dsp.window.resize(), { mouse = true })
+	-- Normalize every tiled boundary on the active workspace after resizing.
+	bind(modBind("mouse:273"), uwsm.raw(layoutGrid.normalize_helper), { release = true })
 end)
 
 defineBindBlock("media", function()

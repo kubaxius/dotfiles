@@ -1,0 +1,272 @@
+#!/usr/bin/env bash
+
+# WIP: experimental interpolated snapping for the master layout.
+
+set -euo pipefail
+
+# A release bind can run before Hyprland has cleared its interactive-resize
+# state. Wait one or two frames so the resulting layout change is animated.
+sleep 0.05
+
+grid_width="${1:-}"
+grid_height="${2:-}"
+
+if ! [[ "$grid_width" =~ ^[1-9][0-9]*$ && "$grid_height" =~ ^[1-9][0-9]*$ ]]; then
+	printf 'Usage: %s GRID_WIDTH GRID_HEIGHT\n' "${0##*/}" >&2
+	exit 2
+fi
+
+command -v jq >/dev/null 2>&1 || {
+	printf '%s requires jq\n' "${0##*/}" >&2
+	exit 1
+}
+
+active_window="$(hyprctl -j activewindow)"
+active_workspace="$(hyprctl -j activeworkspace)"
+
+workspace_id="$(jq -r '.id // empty' <<<"$active_workspace")"
+monitor_id="$(jq -r '.monitorID // empty' <<<"$active_workspace")"
+layout="$(jq -r '.tiledLayout // empty' <<<"$active_workspace")"
+
+# Some Hyprland versions do not expose monitorID on activeworkspace.
+if [[ -z "$monitor_id" || "$monitor_id" == "null" ]]; then
+	monitor_id="$(jq -r '.monitor // empty' <<<"$active_window")"
+fi
+
+if [[ -z "$workspace_id" || -z "$monitor_id" ]]; then
+	exit 0
+fi
+
+monitor="$(hyprctl -j monitors | jq -c --argjson id "$monitor_id" '.[] | select(.id == $id)')"
+if [[ -z "$monitor" ]]; then
+	exit 0
+fi
+
+read -r monitor_x monitor_y monitor_width monitor_height monitor_scale transform reserved_left reserved_top reserved_right reserved_bottom < <(
+	jq -r '[.x, .y, .width, .height, .scale, .transform, .reserved[0], .reserved[1], .reserved[2], .reserved[3]] | @tsv' <<<"$monitor"
+)
+
+# Monitor dimensions are physical pixels; client geometry is logical pixels.
+# Quarter-turn transforms swap the output axes.
+if (( transform % 2 == 1 )); then
+	tmp="$monitor_width"
+	monitor_width="$monitor_height"
+	monitor_height="$tmp"
+fi
+
+read -r work_x work_y work_width work_height < <(
+	awk -v mx="$monitor_x" -v my="$monitor_y" -v mw="$monitor_width" -v mh="$monitor_height" \
+		-v scale="$monitor_scale" -v left="$reserved_left" -v top="$reserved_top" \
+		-v right="$reserved_right" -v bottom="$reserved_bottom" 'BEGIN {
+		printf "%.0f %.0f %.0f %.0f\n", mx + left, my + top,
+			mw / scale - left - right, mh / scale - top - bottom
+	}'
+)
+
+workspace_clients() {
+	hyprctl -j clients | jq -c --argjson workspace "$workspace_id" '[
+		.[]
+		| select(
+			.workspace.id == $workspace
+			and .mapped
+			and .visible
+			and (.floating | not)
+			and .fullscreen == 0
+		)
+	]'
+}
+
+clients="$(workspace_clients)"
+tiled_count="$(jq 'length' <<<"$clients")"
+
+if (( tiled_count < 2 )); then
+	exit 0
+fi
+
+orientation="$(hyprctl -j getoption master:orientation | jq -r '.str // empty')"
+center_threshold="$(hyprctl -j getoption master:slave_count_for_center_master | jq -r '.int // 0')"
+fallback="$(hyprctl -j getoption master:center_master_fallback | jq -r '.str // "left"')"
+slave_count=$((tiled_count - 1))
+effective_orientation="$orientation"
+
+if [[ "$orientation" == "center" && "$center_threshold" =~ ^[0-9]+$ \
+	&& "$center_threshold" -gt 0 && "$slave_count" -lt "$center_threshold" ]]; then
+	effective_orientation="$fallback"
+fi
+
+# Calculate the snapped master/slave factor without applying it yet. When a
+# vertical correction is also needed, both axes are advanced together below.
+master_width=""
+master_factor=""
+if [[ "$layout" == "master" ]]; then
+	master_width="$(
+		jq -r --arg orientation "$effective_orientation" --argjson center "$((work_x + work_width / 2))" '
+			if $orientation == "right" then
+				sort_by([(0 - .size[1]), (0 - .at[0])]) | first
+			elif $orientation == "center" then
+				sort_by([(((.at[0] + (.size[0] / 2)) - $center) | fabs), (0 - .size[1])]) | first
+			else
+				sort_by([(0 - .size[1]), .at[0]]) | first
+			end
+			| .size[0] // empty
+		' <<<"$clients"
+	)"
+
+	if [[ -n "$master_width" ]]; then
+		master_factor="$(
+			awk -v width="$master_width" -v extent="$work_width" -v cells="$grid_width" 'BEGIN {
+				units = int(width * cells / extent + 0.5)
+				if (units < 1) units = 1
+				if (units >= cells) units = cells - 1
+				printf "%.10f\n", units / cells
+			}'
+		)"
+	fi
+fi
+
+# Record vertical targets before changing the layout. Horizontal mfact changes
+# do not affect their positions.
+columns="$(jq -c 'sort_by([.at[0], .at[1]]) | group_by([.at[0], .size[0]]) | map(sort_by(.at[1])) | map(select(length > 1))' <<<"$clients")"
+declare -a upper_addresses=()
+declare -a lower_addresses=()
+declare -a start_boundaries=()
+declare -a target_boundaries=()
+
+while IFS= read -r column; do
+	window_count="$(jq 'length' <<<"$column")"
+
+	# More windows than grid rows cannot all have distinct grid boundaries.
+	if (( window_count > grid_height )); then
+		continue
+	fi
+
+	for ((boundary_number = 1; boundary_number < window_count; boundary_number++)); do
+		upper_address="$(jq -r --argjson index "$((boundary_number - 1))" '.[$index].address' <<<"$column")"
+		lower_address="$(jq -r --argjson index "$boundary_number" '.[$index].address' <<<"$column")"
+
+		read -r upper_bottom lower_top < <(
+			jq -r --arg upper "$upper_address" --arg lower "$lower_address" '
+				(.[] | select(.address == $upper) | .at[1] + .size[1]) as $upperBottom
+				| (.[] | select(.address == $lower) | .at[1]) as $lowerTop
+				| [$upperBottom, $lowerTop] | @tsv
+			' <<<"$clients"
+		)
+
+		if [[ -z "${upper_bottom:-}" || -z "${lower_top:-}" ]]; then
+			continue
+		fi
+
+		boundary=$(((upper_bottom + lower_top) / 2))
+		target_boundary="$(
+			awk -v boundary="$boundary" -v origin="$work_y" -v extent="$work_height" \
+				-v cells="$grid_height" -v minimum="$boundary_number" \
+				-v maximum="$((grid_height - (window_count - boundary_number)))" 'BEGIN {
+				grid_index = int((boundary - origin) * cells / extent + 0.5)
+				if (grid_index < minimum) grid_index = minimum
+				if (grid_index > maximum) grid_index = maximum
+				printf "%.0f\n", origin + grid_index * extent / cells
+			}'
+		)"
+
+		delta_y=$((target_boundary - boundary))
+		if (( delta_y == 0 )); then
+			continue
+		fi
+
+		upper_addresses+=("$upper_address")
+		lower_addresses+=("$lower_address")
+		start_boundaries+=("$boundary")
+		target_boundaries+=("$target_boundary")
+	done
+done < <(jq -c '.[]' <<<"$columns")
+
+current_boundary() {
+	local upper_address="$1"
+	local lower_address="$2"
+	local current_clients
+
+	current_clients="$(workspace_clients)"
+	jq -r --arg upper "$upper_address" --arg lower "$lower_address" '
+		(.[] | select(.address == $upper) | .at[1] + .size[1]) as $upperBottom
+		| (.[] | select(.address == $lower) | .at[1]) as $lowerTop
+		| (($upperBottom + $lowerTop) / 2 | floor)
+	' <<<"$current_clients"
+}
+
+resize_boundary() {
+	local upper_address="$1"
+	local delta_y="$2"
+	local selector="address:$upper_address"
+
+	if [[ "$layout" == "master" && "$orientation" == "center" \
+		&& "$effective_orientation" != "center" \
+		&& ( "$fallback" == "left" || "$fallback" == "right" ) ]]; then
+		# Hyprland 0.56.x uses center-column resize bookkeeping even while it
+		# visually renders the fallback layout. Resize using the real layout,
+		# then restore the configured orientation in the same IPC evaluation.
+		hyprctl eval "hl.config({ master = { orientation = \"$fallback\" } }); hl.dispatch(hl.dsp.window.resize({ x = 0, y = $delta_y, relative = true, window = \"$selector\" })); hl.config({ master = { orientation = \"center\" } })" >/dev/null
+	else
+		hyprctl dispatch "hl.dsp.window.resize({ x = 0, y = $delta_y, relative = true, window = \"$selector\" })" >/dev/null
+	fi
+}
+
+vertical_count="${#upper_addresses[@]}"
+
+# MasterAlgorithm::resizeTarget() force-warps every window in Hyprland 0.56.x,
+# cancelling the native mfact animation. If vertical snapping is required,
+# interpolate the complete layout so both axes still move as one transition.
+if [[ "$layout" == "master" && "$vertical_count" -gt 0 ]]; then
+	animation_frames=10
+	master_factor_start=""
+	if [[ -n "$master_factor" ]]; then
+		master_factor_start="$(awk -v width="$master_width" -v extent="$work_width" 'BEGIN { printf "%.10f\n", width / extent }')"
+	fi
+
+	for ((frame = 1; frame <= animation_frames; frame++)); do
+		progress="$(awk -v frame="$frame" -v frames="$animation_frames" 'BEGIN {
+			t = frame / frames
+			printf "%.10f\n", t * t * (3 - 2 * t)
+		}')"
+
+		if [[ -n "$master_factor" ]]; then
+			frame_factor="$(awk -v start="$master_factor_start" -v target="$master_factor" -v progress="$progress" 'BEGIN {
+				printf "%.10f\n", start + (target - start) * progress
+			}')"
+			hyprctl dispatch "hl.dsp.layout(\"mfact exact $frame_factor\")" >/dev/null
+		fi
+
+		for ((index = 0; index < vertical_count; index++)); do
+			boundary="$(current_boundary "${upper_addresses[$index]}" "${lower_addresses[$index]}")"
+			desired_boundary="$(awk -v start="${start_boundaries[$index]}" \
+				-v target="${target_boundaries[$index]}" -v progress="$progress" 'BEGIN {
+				printf "%.0f\n", start + (target - start) * progress
+			}')"
+			delta_y=$((desired_boundary - boundary))
+			if (( delta_y != 0 )); then
+				resize_boundary "${upper_addresses[$index]}" "$delta_y"
+			fi
+		done
+
+		if (( frame < animation_frames )); then
+			sleep 0.01
+		fi
+	done
+
+	exit 0
+fi
+
+# With no vertical correction, mfact can use Hyprland's native animation.
+if [[ -n "$master_factor" ]]; then
+	hyprctl dispatch "hl.dsp.layout(\"mfact exact $master_factor\")" >/dev/null
+fi
+
+# Other layouts do not force-warp the whole workspace, so a single correction
+# can use their normal resize behavior. Top-to-bottom order keeps previously
+# normalized boundaries fixed as space below them is redistributed.
+for ((index = 0; index < vertical_count; index++)); do
+	boundary="$(current_boundary "${upper_addresses[$index]}" "${lower_addresses[$index]}")"
+	delta_y=$((${target_boundaries[$index]} - boundary))
+	if (( delta_y != 0 )); then
+		resize_boundary "${upper_addresses[$index]}" "$delta_y"
+	fi
+done

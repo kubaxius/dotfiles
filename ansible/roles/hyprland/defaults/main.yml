@@ -23,6 +23,7 @@ hyprland_integration_packages:
 
 # Command-line helpers used by the shared Hyprland and Waybar configuration.
 hyprland_utility_packages:
+  - jq
   - wl-clipboard
   - cliphist
   - playerctl
