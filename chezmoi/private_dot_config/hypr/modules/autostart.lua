@@ -15,9 +15,6 @@ hl.on("hyprland.start", function()
 		"dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE XDG_MENU_PREFIX GDK_BACKEND QT_QPA_PLATFORM QT_QPA_PLATFORMTHEME QT_STYLE_OVERRIDE"
 	)
 
-	uwsm.start("nm-applet", "nm-applet")
-	uwsm.start("xsettingsd", "xsettingsd")
-
 	uwsm.start("wl-paste --type text --watch cliphist store", "wl-paste-text")
 	uwsm.start("wl-paste --type image --watch cliphist store", "wl-paste-image")
 	uwsm.start(

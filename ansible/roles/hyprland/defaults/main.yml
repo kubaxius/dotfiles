@@ -97,6 +97,8 @@ hyprland_feature_flatpaks:
 # transient scopes remain documented in the Hyprland notes.
 hyprland_user_services:
   enable:
+    - nm-applet.service
+    - xsettingsd.service
     - hyprpaper.service
     - hypridle.service
     - waybar.service
