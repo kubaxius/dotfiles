@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This repository is a personal workstation bootstrap lab.
+This repository is a personal workstation bootstrap and dotfiles project.
 
 The goal is to test a one-command setup flow for a fresh Linux machine or VM,
 using:
@@ -18,21 +18,24 @@ using:
 4. Apply user dotfiles safely.
 5. Re-run the command without breaking the system.
 
-## MVP
+## Current scope
 
-The first version should stay small:
+The implemented workflow includes:
 
 - `bootstrap.sh` as the main entrypoint
-- local Ansible playbook for `localhost`
-- base package installation
+- inventory profiles for the Deimos desktop and a laptop
+- base and shell package installation
+- Arch Linux Hyprland packages, plugins, optional workstation features, and
+  Flatpak applications
+- system and user service configuration through a dedicated systemd role
 - chezmoi apply from the local `chezmoi/` source directory
-- simple zsh dotfiles as placeholders
+- modular Hyprland, Zsh, tmux, Waybar, Navi, and related user configuration
 
 ## Out of scope for now
 
 - generic multi-user framework
 - complex role abstractions
 - secrets management
-- full cross-distro support beyond basic package-manager examples
+- complete desktop provisioning on non-Arch distributions
 - destructive system changes
 - GRUB automation before VM testing is comfortable

@@ -6,10 +6,9 @@ Hypridle screen-off wake issues, Waybar crashes, and UWSM startup behavior.
 ## Current Intent
 
 - Use the SDDM session named `Hyprland (uwsm-managed)`.
-- Let systemd user services supervise:
-  - `waybar.service`
-  - `hypridle.service`
-  - `hyprpaper.service`
+- Let systemd user services supervise the session daemons listed in the
+  Hyprland role, including Waybar, Hypridle, Hyprpaper, SwayNC, the policy-kit
+  agent, the NetworkManager applet, and XSettingsD.
 - Keep Hypridle turning the screen off after 10 minutes.
 - Avoid UWSM/systemd launching the XDG autostart batch in Hyprland without
   disabling XDG autostart in other desktop environments.
@@ -37,6 +36,8 @@ Current intended persistent units:
 | `waybar.service` | package | yes |
 | `swaync.service` | package | yes |
 | `hyprpolkitagent.service` | package | yes |
+| `nm-applet.service` | package | yes |
+| `xsettingsd.service` | package | yes |
 
 ## Launch Policy
 
@@ -44,28 +45,33 @@ Current intended persistent units:
   `lib.uwsm.app`, `lib.uwsm.exec`, or `lib.uwsm.start`.
 - Pass an optional unit suffix when a stable UWSM unit name is useful:
   `uwsm.exec("firefox", "firefox")` launches
-  `uwsm-app -u hyprland-firefox.scope -- firefox`.
+  `uwsm-app -t scope -u hyprland-firefox.scope -- firefox` when `uwsm-app` is
+  available, with a compatibility fallback to `uwsm app`.
 - Session shutdown uses `lib.uwsm.stop()` / `uwsm stop`.
 - Only compositor controls and one-shot system controls use raw commands via
   `lib.uwsm.raw` or `lib.uwsm.start_raw`.
 - Launchers need their spawned apps wrapped too:
   `hyprlauncher.conf` sets `desktop_launch_prefix = uwsm app --`, and the
-  future rofi command uses `-run-command "uwsm app -- {cmd}"`.
+  active Rofi command uses `-run-command "uwsm app -- {cmd}"`.
 
-## Local Config Changes
+## Current Local Config Behavior
 
 `modules/autostart.lua`
 
-- Removed manual startup of `hypridle`.
-- Removed unconditional manual startup of `waybar & hyprpaper`.
-- Added a fallback for non-UWSM Hyprland sessions:
+- Does not start persistent desktop daemons; systemd user services own them.
+- Reloads configured Hyprland plugins with `hyprpm reload` when Hyprland
+  starts.
+- Refreshes the systemd/DBus activation environment with the active Wayland
+  and toolkit variables.
+- Runs the per-workspace application setup.
 
 ```lua
-uwsm.start_raw([[test "$DESKTOP_SESSION" = hyprland-uwsm || (waybar & hyprpaper)]])
+hl.on("hyprland.start", function()
+	uwsm.start_raw("hyprpm reload")
+	-- Update the activation environment, then set up workspace applications.
+	workspaces.setup_workspaces()
+end)
 ```
-
-This prevents duplicate Waybar under UWSM, while still giving a bar if the
-old non-UWSM Hyprland session is used.
 
 `hypridle.conf`
 
@@ -87,12 +93,27 @@ hypridle
 hyprpaper
 waybar
 uwsm
+hyprpolkitagent
+swaync
+networkmanager
+network-manager-applet
+xsettingsd
+wl-clipboard
+cliphist
 ```
 
 User services enabled:
 
 ```sh
-systemctl --user enable waybar.service hypridle.service hyprpaper.service
+systemctl --user enable \
+  nm-applet.service \
+  xsettingsd.service \
+  hyprpaper.service \
+  hypridle.service \
+  waybar.service \
+  swaync.service \
+  hyprpolkitagent.service
+systemctl --user enable clipboard.target
 ```
 
 UWSM's Hyprland-specific XDG autostart target is masked:
@@ -125,25 +146,20 @@ WAYLAND_DISPLAY=...
 Confirm services:
 
 ```sh
-systemctl --user is-active graphical-session.target waybar hypridle hyprpaper
-systemctl --user is-enabled waybar hypridle hyprpaper \
+systemctl --user is-active \
+  graphical-session.target clipboard.target \
+  nm-applet xsettingsd hyprpaper hypridle waybar swaync hyprpolkitagent
+systemctl --user is-enabled \
+  nm-applet xsettingsd hyprpaper hypridle waybar swaync hyprpolkitagent \
+  clipboard.target \
   xdg-desktop-autostart.target \
   wayland-session-xdg-autostart@hyprland.desktop.target
 ```
 
-Expected:
-
-```text
-active
-active
-active
-active
-enabled
-enabled
-enabled
-static
-masked
-```
+The graphical session, clipboard target, and listed services should be active.
+The service units and clipboard target should be enabled, the shared XDG
+autostart target should remain available, and
+`wayland-session-xdg-autostart@hyprland.desktop.target` should be masked.
 
 Confirm one Waybar layer:
 
@@ -176,7 +192,8 @@ mask. The executable definitions are:
 ```text
 ansible/roles/hyprland/defaults/main.yml
 ansible/roles/hyprland/tasks/main.yml
-ansible/roles/hyprland/tasks/services.yml
+ansible/roles/systemd/defaults/main.yml
+ansible/roles/systemd/tasks/main.yml
 ```
 
 Avoid starting `waybar`, `hypridle`, or `hyprpaper` from Ansible provisioning.

@@ -28,17 +28,24 @@ home directory entries.
 │   │       └── host_vars/
 │   │           └── localhost.yml
 │   ├── playbook.yml
+│   ├── requirements.yml
 │   └── roles/
 │       ├── base/
 │       ├── chezmoi/
 │       ├── hyprland/
-│       └── shell/
+│       ├── shell/
+│       └── systemd/
 ├── chezmoi/
-│   ├── dot_zshrc
 │   ├── dot_zshenv
+│   ├── dot_codex/
+│   ├── dot_local/
 │   └── private_dot_config/
-│       └── zsh/
-└── system/
+│       ├── hypr/
+│       ├── systemd/
+│       ├── tmux/
+│       ├── waybar/
+│       └── exact_zsh/
+└── tools/
 ```
 
 ## Daily chezmoi workflows
@@ -169,7 +176,7 @@ The intended setup on a new machine is:
 4. Let Ansible install packages and perform system configuration.
 5. Let the playbook run `chezmoi apply` for user configuration.
 
-Once the bootstrap roles are implemented, the process should be:
+The bootstrap roles are implemented. On a new Arch Linux machine, run:
 
 ```bash
 git clone <repository-url> ~/.local/share/chezmoi
@@ -230,9 +237,13 @@ Use this repo inside a fresh VM first:
 
 ## Current status and safety notes
 
-This repository is still a minimal bootstrap lab. The playbook references the
-`base` and `chezmoi` roles, but those roles are not currently present. As a
-result, the documented one-command bootstrap is the target workflow, not yet a
-working fresh-machine installation.
+The one-command workflow provisions the selected workstation profile, installs
+the configured packages and applications, configures Hyprland plugins and
+systemd services, and applies the chezmoi source state. The complete desktop
+provisioning path currently targets Arch Linux. The bootstrap script can install
+Ansible through `apt-get` or `dnf`, and the base role supports those package
+families, but the Hyprland workstation role is intentionally Arch-specific.
 
-Do not add destructive system tasks until they have been tested in a VM.
+Continue testing provisioning changes in a VM before relying on them for a new
+machine, especially changes involving boot configuration, storage, or service
+state.

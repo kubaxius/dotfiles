@@ -16,17 +16,18 @@
     - [General shell inspiration](#general-shell-inspiration)
 
 This directory contains a modular zsh setup intended to be managed as dotfiles.
-In the repo, it lives under `stow/zsh/` because it is a Stow-managed home
-package. The top-level `.zshenv` points zsh at `~/.config/zsh`, where the
-actual interactive loader and configuration modules live.
+In the repo, chezmoi stores it under `chezmoi/private_dot_config/exact_zsh/`.
+The source file `chezmoi/dot_zshenv` becomes `~/.zshenv` and points Zsh at
+`~/.config/zsh`, where the interactive loader and configuration modules are
+deployed.
 
 ## Layout
 
 ```text
-stow/zsh/
-├── .zshenv
-└── .config/zsh/
-    ├── .zshrc
+chezmoi/
+├── dot_zshenv
+└── private_dot_config/exact_zsh/
+    ├── dot_zshrc
     ├── env.zsh
     ├── options.zsh
     ├── history.zsh
@@ -36,8 +37,10 @@ stow/zsh/
     ├── plugins.zsh
     ├── prompt.zsh
     ├── scripts.zsh
-    └── scripts/
-        └── *.zsh
+    ├── tmux.zsh
+    └── exact_scripts/
+        ├── neofetch.zsh
+        └── retry_with_sudo.zsh
 ```
 
 ## How the modular loader works
@@ -59,6 +62,7 @@ Then `$ZDOTDIR/.zshrc` sources each module in a fixed order:
 7. `plugins.zsh`
 8. `prompt.zsh`
 9. `scripts.zsh`
+10. `tmux.zsh`
 
 That order matters.
 
@@ -72,6 +76,9 @@ That order matters.
 - `prompt.zsh` configures the prompt after the rest of the shell is ready.
 - `scripts.zsh` is a loader for small startup scripts stored in
   `.config/zsh/scripts/*.zsh`.
+- `tmux.zsh` attaches interactive local terminals to the shared `main` tmux
+  session unless the shell is remote, already inside tmux, or explicitly
+  opted out.
 
 Because each concern lives in its own file, it is easier to:
 
@@ -83,7 +90,9 @@ Because each concern lives in its own file, it is easier to:
 ## `scripts.zsh` and startup helpers
 
 `scripts.zsh` is intentionally just a dispatcher. It only runs for interactive
-shells and then sources every `*.zsh` file inside `scripts/`.
+shells and sources the helper names explicitly listed in the file. At present,
+only `neofetch.zsh` is enabled; `retry_with_sudo.zsh` is available but is not
+loaded automatically.
 
 That makes it a good place for things like:
 

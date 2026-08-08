@@ -1,5 +1,10 @@
 # The syntax of a Navi cheatsheet
 
+This is a local quick reference for the syntax used by the cheatsheets in this
+directory. For configuration, path discovery, and features added by newer Navi
+versions, consult the
+[upstream syntax documentation](https://github.com/denisidoro/navi/blob/master/docs/cheatsheet/syntax/README.md).
+
 <!-- TOC -->
 
 - [The syntax of a Navi cheatsheet](#the-syntax-of-a-navi-cheatsheet)
@@ -208,7 +213,9 @@ However, it is easy to create aliases using **navi** + a few conventions.
 > [!CAUTION]
 > The examples below will only work if you use **navi** as a shell scripting tool.
 >
-> See [/docs/usage/shell-scripting](/docs/usage/shell-scripting/README.md) for more details.
+> See Navi's
+> [shell-scripting documentation](https://github.com/denisidoro/navi/blob/master/docs/usage/shell-scripting/README.md)
+> for more details.
 
 For example, suppose you decide to end some of your commands with `:: <some_alias>`:
 
