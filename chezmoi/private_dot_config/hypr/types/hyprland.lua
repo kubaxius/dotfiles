@@ -17,6 +17,16 @@ function HyprlandLua.on(event, callback) end
 ---@return string
 function HyprlandLua.get_current_submap() end
 
+---@return HyprlandWorkspace[]
+function HyprlandLua.get_workspaces() end
+
+---@param selector integer|string
+---@return HyprlandWorkspace?
+function HyprlandLua.get_workspace(selector) end
+
+---@return HyprlandWorkspace?
+function HyprlandLua.get_active_workspace() end
+
 ---@param key string
 ---@param value string
 function HyprlandLua.env(key, value) end
@@ -43,6 +53,11 @@ function HyprlandLua.gesture(gesture) end
 
 ---@param device HyprlandDevice
 function HyprlandLua.device(device) end
+
+---@param callback fun()
+---@param options HyprlandTimerOptions
+---@return HyprlandTimer
+function HyprlandLua.timer(callback, options) end
 
 ---@param bind string
 ---@param dispatcher any
@@ -100,11 +115,22 @@ function HyprlandLua.permission(path, permission, policy) end
 ---@class HyprlandHandle
 ---@field set_enabled fun(self: HyprlandHandle, enabled: boolean)
 
+---@class HyprlandTimer: HyprlandHandle
+---@field is_enabled fun(self: HyprlandTimer): boolean
+
+---@class HyprlandTimerOptions
+---@field timeout integer Milliseconds between invocations.
+---@field type "oneshot"|"repeat"
+
 ---@class HyprlandMonitor
 ---@field output string
 ---@field mode string
 ---@field position string
 ---@field scale string
+
+---@class HyprlandWorkspace
+---@field id integer
+---@field name string
 
 ---@class HyprlandConfig
 ---@field plugin? HyprlandPluginConfig

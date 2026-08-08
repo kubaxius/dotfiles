@@ -8,7 +8,11 @@ local uwsm = require("lib.uwsm")
 local keys = require("lib.keys")
 local notify = require("lib.notify")
 local submaps = require("lib.submaps")
-local workspaceMap = require("lib.workspace_map")
+-- Re-read and reapply the persisted animation profile after a config reload.
+package.loaded["lib.animation_mode"] = nil
+package.loaded["lib.workspace_switcher"] = nil
+local animationMode = require("lib.animation_mode")
+local workspaceSwitcher = require("lib.workspace_switcher")
 local layoutGrid = require("modules.window-management.layout").grid
 -- clear any stale config of the bind-blocks
 package.loaded["lib.bind-blocks"] = nil
@@ -30,6 +34,8 @@ end
 
 -- Universal bind to choose or reset submaps from anywhere.
 bind(mainMod .. " + SHIFT + escape", uwsm.raw(scripts_dir .. "rofi-submap-menu"), { submap_universal = true })
+-- Toggle the session-wide animation and workspace-switching profile.
+bind(modBind("SHIFT + A"), animationMode.toggle_mode, { submap_universal = true })
 
 ---------------------------
 ---- KEYBINDING BLOCKS ----
@@ -69,9 +75,8 @@ end)
 defineBindBlock("numbered-workspaces", function()
 	for i = 1, 10 do
 		local key = i % 10 -- 10 maps to key 0
-		local workspace = workspaceMap.physical(i)
-		bind(modBind(tostring(key)), hl.dsp.focus({ workspace = workspace }))
-		bind(modBind("SHIFT + " .. key), hl.dsp.window.move({ workspace = workspace }))
+		bind(modBind(tostring(key)), workspaceSwitcher.switch_workspace(i))
+		bind(modBind("SHIFT + " .. key), workspaceSwitcher.move_window_to_workspace(i))
 	end
 end)
 
@@ -81,10 +86,12 @@ defineBindBlock("special-workspace", function()
 end)
 
 defineBindBlock("workspace-scroll", function()
-	bind(modBind("mouse_down"), hl.dsp.focus({ workspace = "e+1" }))
-	bind(modBind("mouse_up"), hl.dsp.focus({ workspace = "e-1" }))
-	bind("F19", hl.dsp.focus({ workspace = "e-1" }))
-	bind("XF86TouchpadToggle", hl.dsp.focus({ workspace = "e+1" }))
+	bind(modBind("mouse_down"), workspaceSwitcher.switch_workspace("e+1"))
+	bind(modBind("mouse_up"), workspaceSwitcher.switch_workspace("e-1"))
+	bind(modBind("SHIFT + mouse_down"), workspaceSwitcher.switch_workspace("e+1"))
+	bind(modBind("SHIFT + mouse_up"), workspaceSwitcher.switch_workspace("e-1"))
+	bind("F19", workspaceSwitcher.switch_workspace("e-1"))
+	bind("XF86TouchpadToggle", workspaceSwitcher.switch_workspace("e+1"))
 end)
 
 defineBindBlock("macro-keys", function()
@@ -166,10 +173,9 @@ defineBindBlock("numpad-workspaces", function()
 	}
 
 	for _, binding in ipairs(keypadWorkspaces) do
-		local workspace = workspaceMap.physical(binding.workspace)
-		bind(binding.key, hl.dsp.focus({ workspace = workspace }))
-		bind("SHIFT + " .. binding.key, hl.dsp.window.move({ workspace = workspace, follow = false }))
-		--bind("MOD3 + " .. binding.key, hl.dsp.window.move({ workspace = binding.workspace, follow = false }))
+		bind(binding.key, workspaceSwitcher.switch_workspace(binding.workspace))
+		bind("SHIFT + " .. binding.key, workspaceSwitcher.move_window_to_workspace(binding.workspace, false))
+		-- bind("MOD3 + " .. binding.key, workspaceSwitcher.move_window_to_workspace(binding.workspace, false))
 	end
 end, {
 	bind = "code:77",
@@ -203,9 +209,7 @@ useBindBlocks(universalBindBlocks)
 defineSubmap("hyprexpo", function()
 	for i = 1, 9 do
 		local logicalWorkspace = i
-		local function selectWorkspace()
-			hl.plugin.hyprexpo.kb_selecti(workspaceMap.physical(logicalWorkspace))
-		end
+		local selectWorkspace = workspaceSwitcher.select_hyprexpo_workspace(logicalWorkspace)
 
 		bind(tostring(logicalWorkspace), selectWorkspace)
 		bind("KP_" .. logicalWorkspace, selectWorkspace)

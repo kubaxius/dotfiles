@@ -29,6 +29,11 @@ local logical_to_physical = {
 	[9] = 3,
 }
 
+local physical_to_logical = {}
+for logical, physical in pairs(logical_to_physical) do
+	physical_to_logical[physical] = logical
+end
+
 local M = {}
 
 ---Converts a user-facing workspace number to Hyprland's physical workspace ID.
@@ -38,6 +43,15 @@ local M = {}
 ---@return integer physical Hyprland workspace ID.
 function M.physical(logical)
 	return logical_to_physical[logical] or logical
+end
+
+---Converts a Hyprland physical workspace ID to its user-facing number.
+---Numbers outside the mapped 1-9 grid pass through unchanged; for example,
+---physical workspace 10 remains logical workspace 10.
+---@param physical integer Hyprland workspace ID.
+---@return integer logical User-facing workspace number.
+function M.logical(physical)
+	return physical_to_logical[physical] or physical
 end
 
 ---Builds a workspace selector for a rule or dispatcher.
