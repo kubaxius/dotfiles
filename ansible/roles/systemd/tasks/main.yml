@@ -1,33 +1,27 @@
 ---
-- name: Enable required workstation system services
+- name: Enable required system services
   become: true
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
     state: started
-  loop: >-
-    {{
-      (hyprland_system_services + hyprland_selected_feature_services)
-      | unique
-    }}
+  loop: "{{ systemd_system_services.enable | unique }}"
+  loop_control:
+    label: "{{ item }}"
 
-- name: Enable Hyprland user services
+- name: Enable required user services
   become: false
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
     scope: user
-  loop: >-
-    {{
-      (hyprland_user_services.enable + hyprland_selected_feature_user_services)
-      | unique
-    }}
+  loop: "{{ systemd_user_services.enable | unique }}"
   loop_control:
     label: "{{ item }}"
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
   tags:
-    - hyprland-user-services
+    - systemd-user-services
 
 - name: Unmask shared user targets
   become: false
@@ -35,38 +29,38 @@
     name: "{{ item }}"
     masked: false
     scope: user
-  loop: "{{ hyprland_user_targets.unmask }}"
+  loop: "{{ systemd_user_targets.unmask | unique }}"
   loop_control:
     label: "{{ item }}"
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
   tags:
-    - hyprland-user-services
+    - systemd-user-services
 
-- name: Mask Hyprland user targets
+- name: Mask user targets
   become: false
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     masked: true
     scope: user
-  loop: "{{ hyprland_user_targets.mask }}"
+  loop: "{{ systemd_user_targets.mask | unique }}"
   loop_control:
     label: "{{ item }}"
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
   tags:
-    - hyprland-user-services
+    - systemd-user-services
 
-- name: Enable Hyprland user targets
+- name: Enable user targets
   become: false
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
     scope: user
-  loop: "{{ hyprland_user_targets.enable }}"
+  loop: "{{ systemd_user_targets.enable | unique }}"
   loop_control:
     label: "{{ item }}"
   environment:
     XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
   tags:
-    - hyprland-user-services
+    - systemd-user-services

@@ -9,3 +9,20 @@
       hyprland_workstation_features: "{{ workstation_features | default([]) }}"
       when: ansible_facts.os_family == "Archlinux"
     - role: chezmoi
+    - role: systemd
+      systemd_system_services:
+        enable: >-
+          {{
+            (hyprland_system_services + hyprland_selected_feature_services)
+            | unique
+          }}
+      systemd_user_services:
+        enable: >-
+          {{
+            (
+              hyprland_user_services.enable
+              + hyprland_selected_feature_user_services
+            ) | unique
+          }}
+      systemd_user_targets: "{{ hyprland_user_targets }}"
+      when: ansible_facts.os_family == "Archlinux"

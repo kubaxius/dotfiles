@@ -1,0 +1,12 @@
+---
+# Units and targets are supplied by the roles that own their configuration.
+systemd_system_services:
+  enable: []
+
+systemd_user_services:
+  enable: []
+
+systemd_user_targets:
+  enable: []
+  mask: []
+  unmask: []

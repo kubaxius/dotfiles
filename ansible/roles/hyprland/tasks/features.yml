@@ -17,7 +17,7 @@
       {{ hyprland_feature_packages.keys() | sort | join(', ') }}.
   tags:
     - hyprland-feature-resolution
-    - hyprland-user-services
+    - systemd-user-services
     - hyprland-flatpaks
     - hyprland-media-apps
 
@@ -29,7 +29,7 @@
     hyprland_selected_feature_flatpaks: []
   tags:
     - hyprland-feature-resolution
-    - hyprland-user-services
+    - systemd-user-services
     - hyprland-flatpaks
     - hyprland-media-apps
 
@@ -55,7 +55,7 @@
   loop: "{{ hyprland_workstation_features }}"
   tags:
     - hyprland-feature-resolution
-    - hyprland-user-services
+    - systemd-user-services
     - hyprland-flatpaks
     - hyprland-media-apps
 

@@ -11,8 +11,5 @@
 - name: Configure AUR support and install workstation packages
   ansible.builtin.import_tasks: aur.yml
 
-- name: Configure workstation services
-  ansible.builtin.import_tasks: services.yml
-
 - name: Configure Flathub applications
   ansible.builtin.import_tasks: flathub.yml
