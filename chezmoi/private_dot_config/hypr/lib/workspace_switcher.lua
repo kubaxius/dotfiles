@@ -29,9 +29,9 @@ Public API:
 ]]
 
 local animationMode = require("lib.animation_mode")
-local notify        = require("lib.notify")
-local workspaceMap  = require("lib.workspace_map")
-local plugin        = require("lib.plugin")
+local notify = require("lib.notify")
+local workspaceMap = require("lib.workspace_map")
+local plugin = require("lib.plugin")
 
 local M = {}
 
@@ -163,7 +163,7 @@ function M.switch_workspace(target, forceFast)
 			return
 		end
 
-		if forceFast or animationMode.get_mode() == "fast" or !plugin.is_loaded("hyprexpo") then
+		if forceFast or animationMode.get_mode() == "fast" or not plugin.is_loaded("hyprexpo") then
 			cancelPendingSelection()
 			focusWorkspace(resolvedTarget)
 			return
