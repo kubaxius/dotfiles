@@ -18,6 +18,7 @@ fi
 alias source-py="source .venv/bin/activate"
 alias unsource="deactivate"
 alias zsh-restart="clear; exec zsh"
-alias i="paru -S"
+alias i="paru -S --needed"
+alias update="paru -Syu"
 # kitty without the tmux
 alias bare-kitty='kitty env DISABLE_TMUX_AUTOSTART=1 zsh -l'
