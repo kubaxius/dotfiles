@@ -1,3 +1,7 @@
+----------------
+---- PLUGIN ----
+----------------
+
 local M = {}
 
 function M.is_loaded(name)
