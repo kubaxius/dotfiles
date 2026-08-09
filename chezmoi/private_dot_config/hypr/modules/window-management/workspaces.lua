@@ -5,31 +5,34 @@
 local programs = require("modules.programs")
 local uwsm = require("lib.uwsm")
 local workspaceMap = require("lib.workspace_map")
+local plugin = require("lib.plugin")
 
-hl.config({
-	plugin = {
-		hyprexpo = {
-			columns = 3,
-			gaps_in = 0,
-			gaps_out = 0,
-			bg_col = "rgb(111111)",
-			border_color_focus = "",
-			border_color_current = "",
-			workspace_method = "first 1",
-			max_workspace = 9,
-			label_text_mode = "token",
-			label_token_map = workspaceMap.hyprexpo_labels(9),
-			label_position = "bottom-left",
-			label_font_size = 20,
-			label_bg_shape = "rounded",
-			show_workspace_numbers = 0,
-			number_key_mode = "passthrough",
-			gesture_distance = 200,
-			cancel_key = "escape",
-			show_cursor = 1,
+if plugin.is_loaded("hyprexpo") then
+	hl.config({
+		plugin = {
+			hyprexpo = {
+				columns = 3,
+				gaps_in = 0,
+				gaps_out = 0,
+				bg_col = "rgb(111111)",
+				border_color_focus = "",
+				border_color_current = "",
+				workspace_method = "first 1",
+				max_workspace = 9,
+				label_text_mode = "token",
+				label_token_map = workspaceMap.hyprexpo_labels(9),
+				label_position = "bottom-left",
+				label_font_size = 20,
+				label_bg_shape = "rounded",
+				show_workspace_numbers = 0,
+				number_key_mode = "passthrough",
+				gesture_distance = 200,
+				cancel_key = "escape",
+				show_cursor = 1,
+			},
 		},
-	},
-})
+	})
+end
 
 local M = {}
 
