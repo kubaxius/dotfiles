@@ -1,8 +1,5 @@
 {
-  "diagnostics.globals": ["hl"],
-  "workspace.library": ["types", "lib", "vendor"],
+  "workspace.library": ["/usr/share/hypr/stubs", "lib", "vendor"],
   "runtime.version": "Lua 5.4",
-    "diagnostics.disable": [
-        "redundant-parameter"
-    ]
+  "diagnostics.disable": ["redundant-parameter"]
 }
