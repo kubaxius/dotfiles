@@ -1,0 +1,242 @@
+#!/usr/bin/env python3
+"""Send color updates to a ckb-next Pipe animation."""
+
+from __future__ import annotations
+
+import argparse
+import errno
+import os
+from pathlib import Path
+import re
+import stat
+import sys
+
+COLOR_PATTERN = re.compile(r"^[0-9a-fA-F]{6}(?:[0-9a-fA-F]{2})?$")
+COLOR_NAME_PATTERN = re.compile(r"^[a-zA-Z][a-zA-Z0-9_-]*$")
+MAX_ZONE_LENGTH = 128
+PIPE_DIRECTORY = Path("/tmp")
+
+
+class CkbPipeError(Exception):
+    """An error that should be shown without a traceback."""
+
+
+def parse_pipe_index(value: str) -> int:
+    try:
+        index = int(value, 10)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError("must be an integer from 0 to 999") from error
+
+    if not 0 <= index <= 999:
+        raise argparse.ArgumentTypeError("must be an integer from 0 to 999")
+
+    return index
+
+
+def normalize_color(value: str, description: str = "color") -> str:
+    color = value.removeprefix("#")
+    if not COLOR_PATTERN.fullmatch(color):
+        raise CkbPipeError(
+            f"invalid {description} {value!r}; expected RRGGBB or RRGGBBAA"
+        )
+
+    if len(color) == 6:
+        color += "ff"
+
+    return color.lower()
+
+
+def palette_path() -> Path:
+    config_home = os.environ.get("XDG_CONFIG_HOME")
+    if config_home:
+        return Path(config_home) / "ckb-pipe" / "colors.conf"
+
+    return Path.home() / ".config" / "ckb-pipe" / "colors.conf"
+
+
+def load_palette(path: Path) -> dict[str, str]:
+    if not path.exists():
+        return {}
+
+    colors: dict[str, str] = {}
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError as error:
+        raise CkbPipeError(f"cannot read palette {path}: {error.strerror}") from error
+
+    for line_number, source_line in enumerate(lines, start=1):
+        line = source_line.strip()
+        if not line or line.startswith("#"):
+            continue
+
+        name, separator, value = line.partition("=")
+        name = name.strip()
+        value = value.strip()
+        location = f"{path}:{line_number}"
+
+        if not separator or not name or not value:
+            raise CkbPipeError(
+                f"invalid palette entry at {location}; expected name = color"
+            )
+        if not COLOR_NAME_PATTERN.fullmatch(name):
+            raise CkbPipeError(f"invalid color name {name!r} at {location}")
+
+        normalized_name = name.lower()
+        if normalized_name in colors:
+            raise CkbPipeError(f"duplicate color name {name!r} at {location}")
+
+        colors[normalized_name] = normalize_color(value, f"palette color at {location}")
+
+    return colors
+
+
+def resolve_color(value: str, path: Path) -> str:
+    try:
+        return normalize_color(value)
+    except CkbPipeError:
+        pass
+
+    if not COLOR_NAME_PATTERN.fullmatch(value):
+        raise CkbPipeError(
+            f"invalid color {value!r}; expected RRGGBB, RRGGBBAA, or a configured name"
+        )
+
+    palette = load_palette(path)
+    try:
+        return palette[value.lower()]
+    except KeyError as error:
+        raise CkbPipeError(
+            f"unknown color {value!r}; define it in {path} or use a hex color"
+        ) from error
+
+
+def validate_zone(value: str) -> str:
+    if (
+        not value
+        or len(value) > MAX_ZONE_LENGTH
+        or ":" in value
+        or any(
+            not character.isprintable() or character.isspace() for character in value
+        )
+    ):
+        raise CkbPipeError(
+            "invalid zone; use a non-empty ckb-next zone name without whitespace or ':'"
+        )
+
+    return value
+
+
+def pipe_path(index: int) -> Path:
+    return PIPE_DIRECTORY / f"ckbpipe{index:03d}"
+
+
+def write_update(path: Path, update: str) -> None:
+    flags = os.O_WRONLY | os.O_NONBLOCK
+    flags |= getattr(os, "O_CLOEXEC", 0)
+    flags |= getattr(os, "O_NOFOLLOW", 0)
+
+    try:
+        descriptor = os.open(path, flags)
+    except FileNotFoundError as error:
+        raise CkbPipeError(
+            f"pipe {path} does not exist; enable that Pipe animation in ckb-next"
+        ) from error
+    except PermissionError as error:
+        raise CkbPipeError(f"permission denied opening pipe {path}") from error
+    except OSError as error:
+        if error.errno == errno.ENXIO:
+            raise CkbPipeError(f"pipe {path} has no active reader") from error
+        if error.errno == errno.ELOOP:
+            raise CkbPipeError(f"refusing to follow symlink at {path}") from error
+        raise CkbPipeError(f"cannot open pipe {path}: {error.strerror}") from error
+
+    try:
+        if not stat.S_ISFIFO(os.fstat(descriptor).st_mode):
+            raise CkbPipeError(f"refusing to write to {path}: path is not a FIFO")
+
+        payload = (update + "\n").encode("ascii")
+        try:
+            written = os.write(descriptor, payload)
+        except BrokenPipeError as error:
+            raise CkbPipeError(f"pipe reader at {path} disconnected") from error
+        except BlockingIOError as error:
+            raise CkbPipeError(f"pipe {path} is not ready for an update") from error
+
+        if written != len(payload):
+            raise CkbPipeError(f"could not write a complete update to {path}")
+    finally:
+        os.close(descriptor)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    return argparse.ArgumentParser(
+        prog="ckb-pipe",
+        description="Set colors through a ckb-next Pipe animation.",
+        epilog="""examples:
+  ckb-pipe '#33ccff'
+  ckb-pipe --pipe 1 accent-green
+  ckb-pipe --zone space error
+  ckb-pipe --list-colors
+
+Colors may be RRGGBB or RRGGBBAA, with an optional leading '#'.
+Six-digit colors receive full alpha (FF). Named colors are read from
+$XDG_CONFIG_HOME/ckb-pipe/colors.conf (default: ~/.config/ckb-pipe/colors.conf).""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
+
+def parse_arguments(arguments: list[str] | None = None) -> argparse.Namespace:
+    parser = build_parser()
+    parser.add_argument("color", nargs="?", help="hex color or configured color name")
+    parser.add_argument(
+        "--pipe",
+        type=parse_pipe_index,
+        default=0,
+        metavar="INDEX",
+        help="Pipe animation index from 0 to 999 (default: 0)",
+    )
+    parser.add_argument("--zone", help="set only the named ckb-next zone")
+    parser.add_argument(
+        "--list-colors",
+        action="store_true",
+        help="list named colors from the palette and exit",
+    )
+    options = parser.parse_args(arguments)
+
+    if options.list_colors:
+        if options.color is not None or options.zone is not None or options.pipe != 0:
+            parser.error(
+                "--list-colors cannot be combined with a color, --zone, or --pipe"
+            )
+    elif options.color is None:
+        parser.error("COLOR is required unless --list-colors is used")
+
+    return options
+
+
+def run(arguments: list[str] | None = None) -> int:
+    options = parse_arguments(arguments)
+    path = palette_path()
+
+    if options.list_colors:
+        for name, color in sorted(load_palette(path).items()):
+            print(f"{name} = {color}")
+        return 0
+
+    color = resolve_color(options.color, path)
+    zone = validate_zone(options.zone) if options.zone is not None else None
+    update = f"rgb {zone}:{color}" if zone else f"rgb {color}"
+    write_update(pipe_path(options.pipe), update)
+    return 0
+
+
+def main() -> int:
+    try:
+        return run()
+    except CkbPipeError as error:
+        print(f"ckb-pipe: error: {error}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
