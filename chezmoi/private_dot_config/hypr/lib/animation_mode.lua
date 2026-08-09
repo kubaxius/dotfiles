@@ -39,8 +39,13 @@ local profiles = {
 local stateHome = os.getenv("XDG_STATE_HOME") or ((os.getenv("HOME") or "") .. "/.local/state")
 local stateDirectory = stateHome .. "/hyprland"
 local stateFile = stateDirectory .. "/animation-mode"
-local legacyStateFile = stateDirectory .. "/mode"
 local currentMode
+
+-- TODO: Revisit external filesystem helpers when more persistent state is
+-- added. LuaFileSystem would replace shell-based directory operations, while
+-- Penlight adds recursive path creation and higher-level file helpers on top
+-- of LuaFileSystem. If adopted, install the Lua 5.4 modules through Ansible and
+-- verify that Hyprland's embedded Lua can resolve their package paths.
 
 ---Checks whether a profile name is supported.
 ---@param mode string
@@ -52,17 +57,13 @@ end
 ---Reads a valid persisted mode, falling back safely when none is available.
 ---@return "fancy"|"fast" mode
 local function readPersistedMode()
-	-- Accept the original generic filename as a migration fallback. The next
-	-- mode change writes the value to the new, descriptive filename.
-	for _, path in ipairs({ stateFile, legacyStateFile }) do
-		local file = io.open(path, "r")
-		if file then
-			local mode = file:read("*l")
-			file:close()
+	local file = io.open(stateFile, "r")
+	if file then
+		local mode = file:read("*l")
+		file:close()
 
-			if isValidMode(mode) then
-				return mode
-			end
+		if isValidMode(mode) then
+			return mode
 		end
 	end
 
