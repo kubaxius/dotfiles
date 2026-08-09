@@ -44,8 +44,8 @@ local currentMode
 -- TODO: Revisit external filesystem helpers when more persistent state is
 -- added. LuaFileSystem would replace shell-based directory operations, while
 -- Penlight adds recursive path creation and higher-level file helpers on top
--- of LuaFileSystem. If adopted, install the Lua 5.4 modules through Ansible and
--- verify that Hyprland's embedded Lua can resolve their package paths.
+-- of LuaFileSystem. The matching modules are managed by the Hyprland Ansible
+-- role and track Arch's system Lua version.
 
 ---Checks whether a profile name is supported.
 ---@param mode string

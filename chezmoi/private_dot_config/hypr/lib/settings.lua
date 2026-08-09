@@ -1,0 +1,34 @@
+------------------
+---- SETTINGS ----
+------------------
+
+-- TODO: Implement persistent Hyprland user settings.
+--
+-- This module should own settings that represent durable user preferences,
+-- such as animation mode, gaps, or workspace behavior. These are different
+-- from temporary session-restoration state and should be persisted in a JSON
+-- file below XDG_CONFIG_HOME (for example ~/.config/hypr/settings.json).
+--
+-- Hyprland should be the authority for both reading and changing settings.
+-- The module should load the JSON file into memory, expose the currently
+-- loaded settings, validate changes, save them atomically, and notify the
+-- appropriate feature modules so changes are applied immediately.
+--
+-- Feature modules should remain responsible for interpreting and applying
+-- their own settings. For example, animation_mode should validate and apply
+-- an animation profile while this module handles shared persistence and
+-- serialization.
+--
+-- A future GUI should communicate with the running Hyprland instance instead
+-- of reading or writing settings.json directly:
+--
+--   Read:
+--     GUI -> hyprctl repl -> this module -> current settings as JSON
+--
+--   Write:
+--     GUI -> hyprctl eval -> feature-specific validated setter
+--         -> apply immediately -> this module -> settings.json
+--
+-- This interface can later be hidden behind a small `hypr-settings` command
+-- so the GUI does not need to construct Lua expressions or know the location
+-- and format of the settings file.
