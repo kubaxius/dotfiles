@@ -2,7 +2,7 @@
 ---- LAYOUT ----
 ----------------
 
-local layoutGrid = require("lib.layout-grid")
+local layoutGrid = require("lib.layout_grid")
 
 -- Tiled window boundaries snap to these fractions of the monitor work area.
 -- Change these three values to tune the grid in one place.

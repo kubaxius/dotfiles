@@ -10,18 +10,18 @@ local M = {}
 
 ---Builds the optional UWSM scope-unit argument for an application launch.
 ---Validates the suffix to prevent unsafe shell arguments in generated commands.
----@param unit_name? string Scope unit suffix, without the `hyprland-` prefix.
+---@param unitName? string Scope unit suffix, without the `hyprland-` prefix.
 ---@return string option The formatted option, or an empty string when no unit is requested.
-local function unit_option(unit_name)
-	if not unit_name or unit_name == "" then
+local function unitOption(unitName)
+	if not unitName or unitName == "" then
 		return ""
 	end
 
-	if unit_name:find("[^%w_.@:-]") then
-		error("Invalid UWSM unit name suffix: " .. unit_name)
+	if unitName:find("[^%w_.@:-]") then
+		error("Invalid UWSM unit name suffix: " .. unitName)
 	end
 
-	return " -u hyprland-" .. unit_name .. ".scope"
+	return " -u hyprland-" .. unitName .. ".scope"
 end
 
 ----------------------
@@ -31,10 +31,10 @@ end
 ---Creates a shell command that launches an application in a UWSM scope. DOES NOT EXECUTE IT.
 ---Uses `uwsm-app` when available and falls back to the legacy `uwsm app` command for compatibility.
 ---@param command string Shell command for the application to launch.
----@param unit_name? string Scope unit suffix used to name the systemd scope.
+---@param unitName? string Scope unit suffix used to name the systemd scope.
 ---@return string command Shell command that runs the application through UWSM.
-function M.app(command, unit_name)
-	local unit = unit_option(unit_name)
+function M.app(command, unitName)
+	local unit = unitOption(unitName)
 
 	return "if command -v uwsm-app >/dev/null 2>&1; then exec uwsm-app -t scope"
 		.. unit
@@ -49,26 +49,26 @@ end
 
 ---Creates and retrurns a Hyprland `exec` directive that starts an application through UWSM.
 ---@param command string Shell command for the application to launch.
----@param unit_name? string Scope unit suffix used to name the systemd scope.
+---@param unitName? string Scope unit suffix used to name the systemd scope.
 ---@return string directive Hyprland configuration directive.
-function M.exec(command, unit_name)
-	return hl.dsp.exec_cmd(M.app(command, unit_name))
+function M.exec(command, unitName)
+	return hl.dsp.exec_cmd(M.app(command, unitName))
 end
 
 ---Immediately starts an application through UWSM from Lua configuration code.
 ---@param command string Shell command for the application to launch.
----@param unit_name? string Scope unit suffix used to name the systemd scope.
-function M.start(command, unit_name)
-	hl.exec_cmd(M.app(command, unit_name))
+---@param unitName? string Scope unit suffix used to name the systemd scope.
+function M.start(command, unitName)
+	hl.exec_cmd(M.app(command, unitName))
 end
 
 ---Starts an application in a UWSM scope with Hyprland one-shot window rules.
 ---Scope mode preserves the launch process chain Hyprland uses to associate the first window with these rules.
 ---@param command string Shell command for the application to launch.
----@param unit_name? string Scope unit suffix used to name the systemd scope.
+---@param unitName? string Scope unit suffix used to name the systemd scope.
 ---@param rules table Hyprland window rules applied to the first created window.
-function M.start_with_rules(command, unit_name, rules)
-	hl.exec_cmd(M.app(command, unit_name), rules)
+function M.start_with_rules(command, unitName, rules)
+	hl.exec_cmd(M.app(command, unitName), rules)
 end
 
 -------------

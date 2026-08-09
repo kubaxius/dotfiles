@@ -4,7 +4,7 @@
 
 local M = {}
 
-function M.withMod(mod, key)
+function M.with_mod(mod, key)
 	if mod == "" then
 		return key
 	end

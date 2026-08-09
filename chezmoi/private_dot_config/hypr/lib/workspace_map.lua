@@ -17,7 +17,7 @@
 -- physical IDs only at the Hyprland boundary (binds, rules, and dispatchers).
 -- Keeping the translation here gives the rest of the configuration one shared
 -- source of truth.
-local logical_to_physical = {
+local logicalToPhysical = {
 	[1] = 7,
 	[2] = 8,
 	[3] = 9,
@@ -29,9 +29,9 @@ local logical_to_physical = {
 	[9] = 3,
 }
 
-local physical_to_logical = {}
-for logical, physical in pairs(logical_to_physical) do
-	physical_to_logical[physical] = logical
+local physicalToLogical = {}
+for logical, physical in pairs(logicalToPhysical) do
+	physicalToLogical[physical] = logical
 end
 
 local M = {}
@@ -42,7 +42,7 @@ local M = {}
 ---@param logical integer User-facing workspace number.
 ---@return integer physical Hyprland workspace ID.
 function M.physical(logical)
-	return logical_to_physical[logical] or logical
+	return logicalToPhysical[logical] or logical
 end
 
 ---Converts a Hyprland physical workspace ID to its user-facing number.
@@ -51,7 +51,7 @@ end
 ---@param physical integer Hyprland workspace ID.
 ---@return integer logical User-facing workspace number.
 function M.logical(physical)
-	return physical_to_logical[physical] or physical
+	return physicalToLogical[physical] or physical
 end
 
 ---Builds a workspace selector for a rule or dispatcher.

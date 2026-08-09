@@ -15,18 +15,18 @@ package.loaded["lib.workspace_switcher"] = nil
 local animationMode = require("lib.animation_mode")
 local workspaceSwitcher = require("lib.workspace_switcher")
 local layoutGrid = require("modules.window-management.layout").grid
--- clear any stale config of the bind-blocks
-package.loaded["lib.bind-blocks"] = nil
-local bindBlocks = require("lib.bind-blocks")
+-- clear any stale config of the bind blocks
+package.loaded["lib.bind_blocks"] = nil
+local bindBlocks = require("lib.bind_blocks")
 
 local bind = bindBlocks.bind
-local defineBindBlock = bindBlocks.defineBindBlock
-local useBindBlocks = bindBlocks.useBindBlocks
+local defineBindBlock = bindBlocks.define_bind_block
+local useBindBlocks = bindBlocks.use_bind_blocks
 
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 local function modBind(key)
-	return keys.withMod(mainMod, key)
+	return keys.with_mod(mainMod, key)
 end
 
 local function defineSubmap(name, blocks, resetTo, callback)

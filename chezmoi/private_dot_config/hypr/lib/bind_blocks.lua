@@ -12,12 +12,12 @@ Instead of scattering those bindings directly through the configuration, callers
 define the group once and then opt into it by name. This keeps shared bindings
 consistent across the default keymap and any Hyprland submaps that reuse them.
 
-Ordinary bind blocks are reusable templates. Calling useBindBlock(name) or
-useBindBlocks({ ... }) executes the block callback and creates its binds in the
+Ordinary bind blocks are reusable templates. Calling use_bind_block(name) or
+use_bind_blocks({ ... }) executes the block callback and creates its binds in the
 current Hyprland binding context. This is useful for repeated sets of static
 bindings, including submaps.
 
-Toggleable bind blocks are dynamic runtime groups. When defineBindBlock receives
+Toggleable bind blocks are dynamic runtime groups. When define_bind_block receives
 a toggle specification, the block is materialized once, every bind handle created
 through bindBlocks.bind(...) is captured, and those handles are disabled by
 default unless toggleSpec.enabled is true. The configured toggle bind remains
@@ -32,16 +32,16 @@ Public API:
     Wrapper around hl.bind. Use this inside bind block callbacks so toggleable
     blocks can record their Hyprland handles.
 
-  defineBindBlock(name, callback[, toggleSpec])
+  define_bind_block(name, callback[, toggleSpec])
     Registers a named block. With no toggleSpec, the block is an ordinary
     reusable template. With a toggleSpec, the block becomes a managed runtime
     group.
 
-  useBindBlock(name), useBindBlocks(blocks)
+  use_bind_block(name), use_bind_blocks(blocks)
     Installs ordinary blocks into the current binding context. Toggleable blocks
     are ignored here because they are installed once at definition time.
 
-  enableBlock(name), disableBlock(name), toggleBlock(name), isBlockEnabled(name)
+  enable_block(name), disable_block(name), toggle_block(name), is_block_enabled(name)
     Runtime controls for toggleable blocks.
 
 Toggle spec:
@@ -67,7 +67,7 @@ local activeCapture = nil
 local M = {}
 
 local function blockCommand(action, name)
-	return hl.dsp.exec_cmd(string.format([[hyprctl dispatch 'require("lib.bind-blocks").%s(%q)']], action, name))
+	return hl.dsp.exec_cmd(string.format([[hyprctl dispatch 'require("lib.bind_blocks").%s(%q)']], action, name))
 end
 
 local function normalizeToggleSpec(toggleSpec)
@@ -130,7 +130,7 @@ function M.bind(bind, dispatcher, options)
 	return handle
 end
 
-function M.defineBindBlock(name, callback, toggleSpec)
+function M.define_bind_block(name, callback, toggleSpec)
 	if bindBlocks[name] then
 		error("Bind block already defined: " .. name)
 	end
@@ -159,22 +159,22 @@ function M.defineBindBlock(name, callback, toggleSpec)
 	end
 
 	setHandlesEnabled(block, toggle.enabled == true)
-	M.bind(toggle.bind, blockCommand("toggleBlock", name), toggle.options or { submap_universal = true })
+	M.bind(toggle.bind, blockCommand("toggle_block", name), toggle.options or { submap_universal = true })
 end
 
-function M.enableBlockDispatcher(name)
-	return blockCommand("enableBlock", name)
+function M.enable_block_dispatcher(name)
+	return blockCommand("enable_block", name)
 end
 
-function M.disableBlockDispatcher(name)
-	return blockCommand("disableBlock", name)
+function M.disable_block_dispatcher(name)
+	return blockCommand("disable_block", name)
 end
 
-function M.toggleBlockDispatcher(name)
-	return blockCommand("toggleBlock", name)
+function M.toggle_block_dispatcher(name)
+	return blockCommand("toggle_block", name)
 end
 
-function M.useBindBlock(name)
+function M.use_bind_block(name)
 	local block = bindBlocks[name]
 
 	if not block then
@@ -188,25 +188,25 @@ function M.useBindBlock(name)
 	block.callback()
 end
 
-function M.useBindBlocks(blocks)
+function M.use_bind_blocks(blocks)
 	for _, block in ipairs(blocks or {}) do
 		if type(block) == "function" then
 			block()
 		else
-			M.useBindBlock(block)
+			M.use_bind_block(block)
 		end
 	end
 end
 
-function M.enableBlock(name)
+function M.enable_block(name)
 	setBlockEnabled(name, true, true)
 end
 
-function M.disableBlock(name)
+function M.disable_block(name)
 	setBlockEnabled(name, false, true)
 end
 
-function M.toggleBlock(name)
+function M.toggle_block(name)
 	local block = bindBlocks[name]
 
 	if not block then
@@ -216,7 +216,7 @@ function M.toggleBlock(name)
 	setBlockEnabled(name, not block.enabled, true)
 end
 
-function M.isBlockEnabled(name)
+function M.is_block_enabled(name)
 	local block = bindBlocks[name]
 
 	if not block then
