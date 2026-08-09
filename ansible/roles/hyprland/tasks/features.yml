@@ -63,18 +63,7 @@
   ansible.builtin.debug:
     msg:
       features: "{{ hyprland_workstation_features }}"
-      packages: >-
-        {{
-          (
-            hyprland_session_packages
-            + hyprland_integration_packages
-            + hyprland_utility_packages
-            + hyprland_lua_packages
-            + hyprland_graphical_packages
-            + hyprland_plugin_build_packages
-            + hyprland_selected_feature_packages
-          ) | unique
-        }}
+      packages: "{{ hyprland_workstation_packages }}"
       system_services: >-
         {{
           (hyprland_system_services + hyprland_selected_feature_services)
