@@ -17,8 +17,9 @@ direct workspace lookup uses physical IDs and does not consistently resolve
 those selectors when called from Lua callbacks used by wheel bindings.
 
 Public API:
-  switch_workspace(target)
+  switch_workspace(target[, forceFast])
     Returns a mode-aware callback for a logical workspace number or selector.
+    When forceFast is true, the callback always focuses the workspace directly.
 
   move_window_to_workspace(target[, follow])
     Returns a dispatcher that moves a window to a logical workspace number.
@@ -32,9 +33,10 @@ local workspaceMap = require("lib.workspace_map")
 
 local M = {}
 
-local selectionDelayMs = 50
+-- Debounce long enough for a rapid follow-up key to replace the first request.
+-- Hyprexpo's visual speed is controlled separately by the windowsMove animation.
+local selectionDelayMs = 2
 local pendingSelection
-local selectionGeneration = 0
 
 ---Translates a public logical target to Hyprland's physical workspace ID.
 ---String selectors pass through for resolution at keypress time.
@@ -48,9 +50,8 @@ local function physicalTarget(target)
 	return target
 end
 
----Cancels any delayed Hyprexpo selection and invalidates its callback.
+---Cancels any delayed Hyprexpo selection.
 local function cancelPendingSelection()
-	selectionGeneration = selectionGeneration + 1
 	if pendingSelection then
 		pendingSelection:set_enabled(false)
 		pendingSelection = nil
@@ -138,14 +139,15 @@ end
 
 ---Builds a mode-aware workspace switch callback for use in a keybinding.
 ---@param target integer|string Logical workspace number or Hyprland selector.
+---@param forceFast? boolean Always focus directly, regardless of animation mode.
 ---@return function callback
-function M.switch_workspace(target)
+function M.switch_workspace(target, forceFast)
 	local physicalWorkspaceTarget = physicalTarget(target)
 
 	return function()
 		local resolvedTarget = resolveWorkspaceId(physicalWorkspaceTarget) or physicalWorkspaceTarget
 
-		if animationMode.get_mode() == "fast" then
+		if forceFast or animationMode.get_mode() == "fast" then
 			cancelPendingSelection()
 			focusWorkspace(resolvedTarget)
 			return
@@ -163,15 +165,18 @@ function M.switch_workspace(target)
 		cancelPendingSelection()
 		hl.plugin.hyprexpo.expo("on")
 
-		local generation = selectionGeneration
-		pendingSelection = hl.timer(function()
-			if generation ~= selectionGeneration then
+		local timer
+		timer = hl.timer(function()
+			-- A newer request may have disabled and replaced this timer. Checking
+			-- identity keeps a stale callback from selecting its old workspace.
+			if pendingSelection ~= timer then
 				return
 			end
 
 			pendingSelection = nil
 			hl.plugin.hyprexpo.kb_selecti(workspaceId)
 		end, { timeout = selectionDelayMs, type = "oneshot" })
+		pendingSelection = timer
 	end
 end
 
@@ -190,6 +195,9 @@ function M.select_hyprexpo_workspace(target)
 	local workspaceId = workspaceMap.physical(target)
 
 	return function()
+		-- The first key may still have a delayed selection pending from opening
+		-- Hyprexpo. A later submap key must supersede that original request.
+		cancelPendingSelection()
 		hl.plugin.hyprexpo.kb_selecti(workspaceId)
 	end
 end
