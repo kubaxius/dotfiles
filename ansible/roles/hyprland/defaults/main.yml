@@ -36,10 +36,11 @@ hyprland_utility_packages:
   - otf-font-awesome
   - ttf-nerd-fonts-symbols
 
-# Lua 5.4 modules used by Hyprland's embedded Lua configuration.
+# Modules for the system Lua version used by Hyprland's Lua configuration.
+# Keep these unversioned so they follow Arch's Lua ABI upgrades with Hyprland.
 hyprland_lua_packages:
-  - lua54-dkjson
-  - lua54-penlight
+  - lua-dkjson
+  - lua-penlight
 
 # User-facing applications referenced by modules/programs.lua and Waybar.
 hyprland_graphical_packages:
