@@ -102,15 +102,32 @@
   },
 
   // =========================
-  // Lua library locations
+  // Lua debugging and libraries
   // =========================
 
   "Lua.workspace.library": [
     "types",
     "lib",
     "vendor",
-    "/usr/share/lua/5.4"
+    "/usr/share/lua/5.5"
   ],
+
+"lua.debug.settings.luaVersion": "lua55",
+
+"lua.debug.settings.path": [
+  "${workspaceFolder}/?.lua",
+  "${workspaceFolder}/?/init.lua",
+  "/usr/local/share/lua/5.5/?.lua",
+  "/usr/local/share/lua/5.5/?/init.lua",
+  "/usr/share/lua/5.5/?.lua",
+  "/usr/share/lua/5.5/?/init.lua"
+],
+
+"lua.debug.settings.cpath": [
+  "${workspaceFolder}/?.so",
+  "/usr/local/lib/lua/5.5/?.so",
+  "/usr/lib/lua/5.5/?.so"
+],
 
   // =========================
   // Markdown Lint rules
