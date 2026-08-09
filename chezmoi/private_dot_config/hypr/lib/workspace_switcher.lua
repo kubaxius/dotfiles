@@ -29,6 +29,7 @@ Public API:
 ]]
 
 local animationMode = require("lib.animation_mode")
+local notify = require("lib.notify")
 local workspaceMap = require("lib.workspace_map")
 
 local M = {}
@@ -62,6 +63,13 @@ end
 ---@param target integer|string
 local function focusWorkspace(target)
 	hl.dispatch(hl.dsp.focus({ workspace = target }))
+end
+
+---Handles a request to switch to the workspace that is already active.
+---Keep this behavior isolated so it can grow without complicating switching.
+---@param workspaceId integer Hyprland physical workspace ID.
+local function onSameWorkspace(workspaceId)
+	notify.hyprland("Already on workspace " .. workspaceMap.logical(workspaceId))
 end
 
 ---Returns existing numeric workspace IDs in user-facing logical order.
@@ -146,6 +154,13 @@ function M.switch_workspace(target, forceFast)
 
 	return function()
 		local resolvedTarget = resolveWorkspaceId(physicalWorkspaceTarget) or physicalWorkspaceTarget
+		local activeWorkspace = hl.get_active_workspace()
+
+		if type(resolvedTarget) == "number" and activeWorkspace and activeWorkspace.id == resolvedTarget then
+			cancelPendingSelection()
+			onSameWorkspace(resolvedTarget)
+			return
+		end
 
 		if forceFast or animationMode.get_mode() == "fast" then
 			cancelPendingSelection()
