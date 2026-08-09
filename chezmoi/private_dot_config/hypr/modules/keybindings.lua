@@ -8,6 +8,7 @@ local uwsm = require("lib.uwsm")
 local keys = require("lib.keys")
 local notify = require("lib.notify")
 local submaps = require("lib.submaps")
+local ckbPipe = require("lib.ckb_pipe")
 -- Re-read and reapply the persisted animation profile after a config reload.
 package.loaded["lib.animation_mode"] = nil
 package.loaded["lib.workspace_switcher"] = nil
@@ -181,9 +182,11 @@ end, {
 	bind = "code:77",
 	on_enable = function()
 		notify.hyprland("Numpad workspace mode")
+		ckbPipe.set("amber-led", { pipe = 0 })
 	end,
 	on_disable = function()
 		notify.hyprland("Numpad number mode")
+		ckbPipe.set("black", { pipe = 0 })
 	end,
 	enabled = true,
 })
