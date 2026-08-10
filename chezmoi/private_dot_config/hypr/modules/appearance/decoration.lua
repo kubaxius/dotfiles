@@ -6,8 +6,9 @@ local plugin = require("lib.plugin")
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
 hl.config({
 	general = {
-		gaps_in = 5,
-		gaps_out = 10,
+		-- Mind the borders!
+		gaps_in = 0,
+		gaps_out = 5,
 
 		border_size = 0,
 
@@ -37,6 +38,14 @@ hl.config({
 			size = 3,
 			passes = 1,
 			vibrancy = 0.1696,
+		},
+
+		glow = {
+			enabled = true,
+			range = 20,
+			render_power = 3,
+			color = "#FFD58044",
+			color_inactive = "#000000aa",
 		},
 	},
 })
