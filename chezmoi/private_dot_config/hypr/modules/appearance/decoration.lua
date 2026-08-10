@@ -45,12 +45,9 @@ local myShadow = {
 	imgborders = {
 		image = "~/.config/hypr/assets/borders/border_squircle.png",
 		sizes = "75, 75, 79, 79", -- left, right, top, bottom
-		insets = "60, 60, 60, 60",
-		--insets = "14, 4, 18, 0", -- left, right, top, bottom
+		insets = "60, 60, 60, 60", -- left, right, top, bottom
 		scale = 1,
 		smooth = false,
-		-- TODO: Report that blur=false makes the border invisible on
-		-- Hyprland 0.56.2; local render-pass fixes were unsuccessful.
 		blur = true,
 	},
 }
@@ -69,7 +66,7 @@ local factorioShadowSquare = {
 local factorioShadowSquareNoInset = {
 	imgborders = {
 		image = "~/.config/hypr/assets/borders/border_factorio_no_inset.png",
-		sizes = "24, 24, 24, 24",
+		sizes = "16, 16, 16, 16",
 		insets = "8, 8, 8, 8",
 		scale = 1,
 		smooth = false,
