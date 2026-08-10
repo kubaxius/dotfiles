@@ -13,8 +13,10 @@ if plugin.is_loaded("hyprexpo") then
 			hyprexpo = {
 				columns = 3,
 				gaps_in = 0,
-				gaps_out = 0,
-				bg_col = "rgb(111111)",
+				gaps_out = 10,
+				--bg_col = "rgb(111111)",
+				wallpaper_bg = 1,
+				border_width = 1,
 				border_color_focus = "",
 				border_color_current = "",
 				workspace_method = "first 1",
