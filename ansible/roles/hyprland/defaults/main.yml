@@ -51,6 +51,7 @@ hyprland_graphical_packages:
   - obsidian
   - pavucontrol
   - kdeconnect
+  - hyprpicker
 
 # Build tools used by hyprpm when compiling plugins against the installed
 # Hyprland version.
