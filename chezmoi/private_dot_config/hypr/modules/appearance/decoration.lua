@@ -53,33 +53,33 @@ hl.config({
 local myShadow = {
 	imgborders = {
 		image = "~/.config/hypr/assets/borders/border_squircle.png",
-		sizes = "75, 75, 79, 79", -- left, right, top, bottom
-		insets = "60, 60, 60, 60", -- left, right, top, bottom
+		sizes = { left = 75, right = 75, top = 79, bottom = 79 },
+		insets = 60,
 		scale = 1,
 		smooth = false,
-		blur = true,
+		blur = false,
 	},
 }
 
 local factorioShadowSquare = {
 	imgborders = {
 		image = "~/.config/hypr/assets/borders/border_factorio_square.png",
-		sizes = "24, 24, 24, 24",
-		insets = "8, 8, 8, 8",
+		sizes = 24,
+		insets = 8,
 		scale = 1,
 		smooth = false,
-		blur = true,
+		blur = false,
 	},
 }
 
 local factorioShadowSquareNoInset = {
 	imgborders = {
 		image = "~/.config/hypr/assets/borders/border_factorio_no_inset.png",
-		sizes = "16, 16, 16, 16",
-		insets = "8, 8, 8, 8",
+		sizes = 16,
+		insets = 8,
 		scale = 1,
 		smooth = false,
-		blur = true,
+		blur = false,
 	},
 }
 
