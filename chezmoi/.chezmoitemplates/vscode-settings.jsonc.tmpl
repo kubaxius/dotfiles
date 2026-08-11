@@ -113,22 +113,22 @@
     "/usr/share/hypr/stubs"
   ],
 
-"lua.debug.settings.luaVersion": "lua55",
+  "lua.debug.settings.luaVersion": "lua55",
 
-"lua.debug.settings.path": [
-  "${workspaceFolder}/?.lua",
-  "${workspaceFolder}/?/init.lua",
-  "/usr/local/share/lua/5.5/?.lua",
-  "/usr/local/share/lua/5.5/?/init.lua",
-  "/usr/share/lua/5.5/?.lua",
-  "/usr/share/lua/5.5/?/init.lua"
-],
+  "lua.debug.settings.path": [
+    "${workspaceFolder}/?.lua",
+    "${workspaceFolder}/?/init.lua",
+    "/usr/local/share/lua/5.5/?.lua",
+    "/usr/local/share/lua/5.5/?/init.lua",
+    "/usr/share/lua/5.5/?.lua",
+    "/usr/share/lua/5.5/?/init.lua"
+  ],
 
-"lua.debug.settings.cpath": [
-  "${workspaceFolder}/?.so",
-  "/usr/local/lib/lua/5.5/?.so",
-  "/usr/lib/lua/5.5/?.so"
-],
+  "lua.debug.settings.cpath": [
+    "${workspaceFolder}/?.so",
+    "/usr/local/lib/lua/5.5/?.so",
+    "/usr/lib/lua/5.5/?.so"
+  ],
 
   // =========================
   // Markdown Lint rules
@@ -263,5 +263,15 @@
     "plaintext": false,
     "markdown": false,
     "scminput": false
-  }
+  },
+  "yaml.disableSchemaDetection": [
+{{- if ne .profile "dotfiles" }}
+    "**/.github/workflows/*.yml",
+    "**/.github/workflows/*.yaml",
+    "**/.gitea/workflows/*.yml",
+    "**/.gitea/workflows/*.yaml",
+    "**/.forgejo/workflows/*.yml",
+    "**/.forgejo/workflows/*.yaml"
+{{- end }}
+  ]
 }
