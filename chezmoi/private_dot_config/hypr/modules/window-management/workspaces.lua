@@ -7,6 +7,8 @@ local uwsm = require("lib.uwsm")
 local workspaceMap = require("lib.workspace_map")
 local plugin = require("lib.plugin")
 
+-- See https://hyprexpo.lol/docs/
+
 if plugin.is_loaded("hyprexpo") then
 	hl.config({
 		plugin = {
