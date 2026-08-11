@@ -1,0 +1,30 @@
+---
+- name: Generate the Elephant systemd user service
+  become: false
+  ansible.builtin.command:
+    argv:
+      - elephant
+      - service
+      - enable
+  args:
+    creates: "{{ ansible_facts.user_dir }}/.config/systemd/user/elephant.service"
+  notify: Reload the systemd user manager
+
+- name: Install the Walker systemd user service
+  become: false
+  ansible.builtin.copy:
+    dest: "{{ ansible_facts.user_dir }}/.config/systemd/user/walker.service"
+    mode: "0644"
+    content: |
+      [Unit]
+      Description=Walker Application Launcher Service
+      PartOf=graphical-session.target
+
+      [Service]
+      ExecStart=/usr/bin/walker --gapplication-service
+      Restart=on-failure
+      RestartSec=5
+
+      [Install]
+      WantedBy=default.target
+  notify: Reload the systemd user manager

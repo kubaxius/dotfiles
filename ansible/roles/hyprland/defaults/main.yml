@@ -35,6 +35,14 @@ hyprland_utility_packages:
   - noto-fonts-emoji
   - otf-font-awesome
   - ttf-nerd-fonts-symbols
+  - walker
+  - elephant
+  - elephant-desktopapplications
+  - elephant-providerlist
+  - elephant-clipboard
+  - elephant-menus
+  - elephant-symbols
+  - elephant-unicode
 
 # Modules for the system Lua version used by Hyprland's Lua configuration.
 # Keep these unversioned so they follow Arch's Lua ABI upgrades with Hyprland.
@@ -146,6 +154,8 @@ hyprland_user_services:
     - waybar.service
     - swaync.service
     - hyprpolkitagent.service
+    - elephant.service
+    - walker.service
 
 # Keep XDG autostart available to other desktop environments, but disable its
 # compositor-specific UWSM entry point for the Hyprland session.

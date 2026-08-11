@@ -11,6 +11,9 @@
 - name: Configure AUR support and install workstation packages
   ansible.builtin.import_tasks: aur.yml
 
+- name: Configure the Elephant launcher backend
+  ansible.builtin.import_tasks: elephant.yml
+
 - name: Configure Hyprland plugins
   ansible.builtin.import_tasks: plugins.yml
 
