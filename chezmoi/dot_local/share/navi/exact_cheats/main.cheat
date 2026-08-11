@@ -6,3 +6,7 @@ flatpak ps --columns=application,pid,child-pid
 # Change branch
 git checkout <branch>
 $ branch: git branch | awk '{print $NF}'
+
+% ssh, keys, security
+# Generate an SSH ed25519 key and copy its public key to the clipboard
+ssh-keygen -t ed25519 -f "$HOME/.ssh/<name>_ed25519" && wl-copy < "$HOME/.ssh/<name>_ed25519.pub"
