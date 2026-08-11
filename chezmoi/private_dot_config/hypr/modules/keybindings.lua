@@ -139,7 +139,7 @@ defineBindBlock("screenshots", function()
 end)
 
 defineBindBlock("hypr-tools", function()
-	bind(modBind("SHIFT + I"), uwsm.raw("hypr-copy-active-window-info"))
+	bind(modBind("SHIFT + I"), uwsm.raw(scripts_dir .. "hypr-copy-active-window-info"))
 end)
 
 defineBindBlock("clipboard", function()
