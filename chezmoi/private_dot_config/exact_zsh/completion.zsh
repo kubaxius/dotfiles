@@ -47,6 +47,38 @@ mkdir -p -- "$zcompdump_dir"
 compinit -d "$zcompdump_dir/zcompdump"
 unset zcompdump_dir
 
+# Zsh's bundled Ansible completion only offers fully qualified module names
+# such as `ansible.builtin.ping`.  Ansible also accepts short names for its
+# built-in modules, so supplement the existing completer when completing the
+# argument to `-m`/`--module-name`.  Load the list lazily to avoid invoking
+# `ansible-doc` during shell startup.
+if (( ${+_comps[ansible]} )); then
+  autoload -Uz +X _ansible
+  functions -c _ansible _ansible_with_fqcn_modules
+
+  _ansible() {
+    local ret
+    _ansible_with_fqcn_modules "$@"
+    ret=$?
+
+    if [[ ${words[CURRENT - 1]} == (-m|--module-name) ]] &&
+      command -v ansible-doc >/dev/null 2>&1
+    then
+      if (( ! ${+_ansible_builtin_modules} )); then
+        typeset -ga _ansible_builtin_modules
+        _ansible_builtin_modules=(
+          ${${${(M)${(f)"$(command ansible-doc -t module -F 2>/dev/null)"}:#ansible.builtin.*}%%[[:space:]]*}#ansible.builtin.}
+        )
+      fi
+
+      _wanted plugins expl 'built-in Ansible module' \
+        compadd -a _ansible_builtin_modules && ret=0
+    fi
+
+    return ret
+  }
+fi
+
 # Register the completion definition provided by the tldr client. The client
 # can only list pages in its local cache, so refresh the complete page archive
 # quietly in the background when it is missing or more than a week old.
