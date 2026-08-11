@@ -1,0 +1,14 @@
+[Unit]
+Description=Walker application launcher
+PartOf=graphical-session.target
+After=graphical-session.target
+Requisite=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/walker --gapplication-service
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
