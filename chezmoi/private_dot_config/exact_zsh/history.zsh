@@ -45,3 +45,5 @@ zshaddhistory() {
   fi
   return 0
 }
+
+# TODO: Use https://atuin.sh/ for better history management.
