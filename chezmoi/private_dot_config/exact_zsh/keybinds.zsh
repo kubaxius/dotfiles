@@ -6,6 +6,16 @@
 # Use Emacs-style key bindings in the command line editor (instead of Vi-style).
 bindkey -e
 
+# Alt+Enter executes the current buffer without adding it to either the
+# in-memory or on-disk history.  A leading space remains supported separately
+# by HIST_IGNORE_SPACE in history.zsh.
+accept-line-without-history() {
+  ZSH_SKIP_NEXT_HISTORY=1
+  zle accept-line
+}
+zle -N accept-line-without-history
+bindkey '^[^M' accept-line-without-history
+
 # If fzf is installed, replace the default Ctrl+R reverse search with a fuzzy
 # history picker that shows many matches at once and lets you narrow them down
 # interactively.
@@ -13,16 +23,7 @@ if command -v fzf >/dev/null 2>&1; then
   fzf-history-widget() {
     local selected
 
-    selected=$(
-      fc -rl 1 |
-        sed 's/^[[:space:]]*[0-9]\+[[:space:]]*//' |
-        awk '!seen[$0]++' |
-        fzf \
-          ${FZF_UI_OPTS[@]} \
-          --prompt='History> ' \
-          --query="$LBUFFER" \
-          --scheme=history
-    ) || return
+    selected=$(zsh-history-fzf "$LBUFFER") || return
 
     BUFFER="$selected"
     CURSOR=$#BUFFER

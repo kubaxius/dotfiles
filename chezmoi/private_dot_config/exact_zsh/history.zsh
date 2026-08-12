@@ -26,3 +26,22 @@ SAVEHIST=10000
 #   destructive ways that break autosuggestion strategies more severely.
 setopt appendhistory inc_append_history sharehistory extended_history
 setopt hist_ignore_dups hist_ignore_space hist_reduce_blanks hist_save_no_dups
+
+# Let a ZLE widget suppress a command explicitly.  This complements
+# HIST_IGNORE_SPACE for commands whose leading whitespace may be lost while
+# editing or pasting.
+typeset -gi ZSH_SKIP_NEXT_HISTORY=0
+
+zshaddhistory() {
+  # ZLE widgets can accept an empty buffer even though there is no useful
+  # command to remember. Explicitly reject empty and whitespace-only entries.
+  if [[ -z ${1//[[:space:]]/} ]]; then
+    return 1
+  fi
+
+  if (( ZSH_SKIP_NEXT_HISTORY )); then
+    ZSH_SKIP_NEXT_HISTORY=0
+    return 1
+  fi
+  return 0
+}

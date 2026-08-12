@@ -1,0 +1,206 @@
+#!/usr/bin/env bash
+
+set -o nounset
+set -o pipefail
+
+readonly HISTORY_CANCELLED=1
+readonly HISTORY_ERROR=2
+readonly DELETE_MARKER='__ZSH_HISTORY_FZF_DELETE__'
+
+declare -a HISTORY_RAW=()
+declare -a HISTORY_COMMAND=()
+
+history_error() {
+  printf 'zsh-history-fzf: %s\n' "$*" >&2
+}
+
+# Zsh extended history stores a multiline command by escaping each embedded
+# newline with a backslash. Keep the original record alongside its decoded
+# command so unchanged records can be written back byte-for-byte.
+parse_history() {
+  local history_file=$1
+  local line raw=''
+
+  HISTORY_RAW=()
+  HISTORY_COMMAND=()
+
+  [[ -e $history_file ]] || return 0
+  [[ -r $history_file ]] || {
+    history_error "cannot read history file: $history_file"
+    return "$HISTORY_ERROR"
+  }
+
+  while IFS= read -r line || [[ -n $line ]]; do
+    if [[ $line =~ ^:\ [0-9]+:[0-9]+\; && -n $raw && $raw != *$'\\\n' ]]; then
+      append_history_record "$raw"
+      raw=''
+    fi
+    raw+="$line"$'\n'
+  done < "$history_file"
+
+  [[ -z $raw ]] || append_history_record "$raw"
+}
+
+append_history_record() {
+  local raw=$1
+  local command
+
+  if [[ $raw =~ ^:\ [0-9]+:[0-9]+\;(.*)$ ]]; then
+    command=${BASH_REMATCH[1]}
+    command=${command%$'\n'}
+    command=${command//$'\\\n'/$'\n'}
+  else
+    # Preserve and display legacy history records that have no timestamp.
+    command=${raw%$'\n'}
+    command=${command//$'\\\n'/$'\n'}
+  fi
+
+  HISTORY_RAW+=("$raw")
+  HISTORY_COMMAND+=("$command")
+}
+
+write_candidates() {
+  local destination=$1
+  local index command
+  declare -A seen=()
+
+  : > "$destination" || return "$HISTORY_ERROR"
+  for ((index = ${#HISTORY_COMMAND[@]} - 1; index >= 0; --index)); do
+    command=${HISTORY_COMMAND[index]}
+    [[ -n $command && -z ${seen["$command"]+present} ]] || continue
+    seen["$command"]=1
+    printf '%d\t%s\0' "$index" "$command" >> "$destination" || return "$HISTORY_ERROR"
+  done
+}
+
+delete_commands() {
+  local history_file=$1
+  shift
+  local selected_index index command temporary
+  declare -A remove=()
+
+  for selected_index in "$@"; do
+    [[ $selected_index =~ ^[0-9]+$ ]] || continue
+    (( selected_index < ${#HISTORY_COMMAND[@]} )) || continue
+    remove["${HISTORY_COMMAND[selected_index]}"]=1
+  done
+  ((${#remove[@]})) || return 0
+
+  temporary=$(mktemp -- "${history_file}.tmp.XXXXXX") || {
+    history_error "cannot create a temporary history file"
+    return "$HISTORY_ERROR"
+  }
+
+  if [[ -e $history_file ]]; then
+    chmod --reference="$history_file" "$temporary" 2>/dev/null || true
+  fi
+
+  for ((index = 0; index < ${#HISTORY_RAW[@]}; ++index)); do
+    command=${HISTORY_COMMAND[index]}
+    if [[ -n $command && -n ${remove[$command]+present} ]]; then
+      continue
+    fi
+    printf '%s' "${HISTORY_RAW[index]}" >> "$temporary" || {
+      rm -f -- "$temporary"
+      history_error "cannot write temporary history file"
+      return "$HISTORY_ERROR"
+    }
+  done
+
+  mv -f -- "$temporary" "$history_file" || {
+    rm -f -- "$temporary"
+    history_error "cannot replace history file: $history_file"
+    return "$HISTORY_ERROR"
+  }
+}
+
+candidate_index() {
+  local candidate=$1
+  printf '%s' "${candidate%%$'\t'*}"
+}
+
+run_fzf() {
+  local candidates=$1 output=$2 mode=$3 query=$4
+  local prompt multi=()
+
+  if [[ $mode == delete ]]; then
+    prompt='Delete history> '
+    multi=(--multi)
+  else
+    prompt='History> '
+  fi
+
+  # FZF_PROMPT is intentionally expanded by the shell running fzf's transform.
+  # shellcheck disable=SC2016
+  fzf \
+    --read0 \
+    --print0 \
+    --print-query \
+    --delimiter=$'\t' \
+    --with-nth='2..' \
+    --scheme=history \
+    --prompt="$prompt" \
+    --query="$query" \
+    "${multi[@]}" \
+    --bind 'tab:toggle+down,shift-tab:toggle+up' \
+    --bind 'ctrl-r:transform:if [ "$FZF_PROMPT" = "History> " ]; then printf "%s\n" "change-prompt(Delete history> )+change-multi"; else printf "%s\n" "change-prompt(History> )+change-multi(0)+clear-multi"; fi' \
+    --bind "enter:transform:if [ \"\$FZF_PROMPT\" = \"Delete history> \" ]; then printf '%s\\n' 'print($DELETE_MARKER)+accept'; else printf '%s\\n' accept; fi" \
+    < "$candidates" > "$output"
+}
+
+main() {
+  local initial_query=${1-}
+  local history_file=${HISTFILE:-"${HOME}/.local/share/zsh/history"}
+  local mode=normal query=$initial_query candidate_file output_file status
+  local -a result=() selected_indices=()
+
+  command -v fzf >/dev/null 2>&1 || {
+    history_error 'fzf is not installed'
+    return "$HISTORY_ERROR"
+  }
+
+  candidate_file=$(mktemp) || return "$HISTORY_ERROR"
+  output_file=$(mktemp) || {
+    rm -f -- "$candidate_file"
+    return "$HISTORY_ERROR"
+  }
+  trap 'rm -f -- "$candidate_file" "$output_file"' RETURN
+
+  while true; do
+    parse_history "$history_file" || return "$HISTORY_ERROR"
+    write_candidates "$candidate_file" || return "$HISTORY_ERROR"
+    : > "$output_file"
+
+    run_fzf "$candidate_file" "$output_file" "$mode" "$query"
+    status=$?
+    if (( status != 0 )); then
+      if (( status == 1 || status == 130 )); then
+        return "$HISTORY_CANCELLED"
+      fi
+      history_error "fzf exited with status $status"
+      return "$HISTORY_ERROR"
+    fi
+
+    result=()
+    mapfile -d '' -t result < "$output_file"
+    ((${#result[@]})) || return "$HISTORY_CANCELLED"
+
+    query=${result[0]}
+    if [[ ${result[1]-} != "$DELETE_MARKER" ]]; then
+      [[ -n ${result[1]-} ]] || return "$HISTORY_CANCELLED"
+      printf '%s' "${result[1]#*$'\t'}"
+      return 0
+    fi
+
+    selected_indices=()
+    for candidate in "${result[@]:2}"; do
+      selected_indices+=("$(candidate_index "$candidate")")
+    done
+    delete_commands "$history_file" "${selected_indices[@]}" || return "$HISTORY_ERROR"
+    mode=delete
+  done
+}
+
+if [[ ${BASH_SOURCE[0]} == "$0" ]]; then
+  main "$@"
+fi
