@@ -245,13 +245,16 @@ items:
         menu:
           - name: Install
             key: i
-            command: run-shell $TMUX_PLUGIN_MANAGER_PATH/tpm/bindings/install_plugins
+            command: display-popup -E -w 100 -h 30 "$HOME/.local/share/tmux/plugins/tpm/tpack tui --install"
           - name: Update
             key: u
-            command: run-shell $TMUX_PLUGIN_MANAGER_PATH/tpm/bindings/update_plugins
+            command: display-popup -E -w 100 -h 30 "$HOME/.local/share/tmux/plugins/tpm/tpack tui --update"
           - name: Clean
             key: c
-            command: run-shell $TMUX_PLUGIN_MANAGER_PATH/tpm/bindings/clean_plugins
+            command: display-popup -E -w 100 -h 30 "$HOME/.local/share/tmux/plugins/tpm/tpack tui --clean"
+          - name: Update Tpack
+            key: U
+            command: display-popup -E -w 100 -h 10 "$HOME/.local/share/tmux/plugins/tpm/tpack self-update"
       - name: Detach
         key: D
         command: detach
@@ -268,10 +271,10 @@ items:
   - separator: true
   - name: Plugin Manager (tpack)
     key: T
-    command: display-popup -E -w 100 -h 30 "$TMUX_PLUGIN_MANAGER_PATH/tpm/tpack tui"
+    command: display-popup -E -w 100 -h 30 "$HOME/.local/share/tmux/plugins/tpm/tpack tui"
   - name: Tmux FZF
     key: F
-    command: run-shell -b $TMUX_PLUGIN_MANAGER_PATH/plugins/tmux-fzf-1b3181280a8e/main.sh
+    command: run-shell -b "TMUX_FZF_CLIENT=#{client_tty} $HOME/.local/share/tmux/plugins/tmux-fzf/main.sh"
   - name: Time
     key: t
     command: clock-mode

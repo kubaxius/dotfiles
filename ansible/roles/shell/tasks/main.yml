@@ -9,7 +9,7 @@
 - name: Create the tmux plugin directory
   become: false
   ansible.builtin.file:
-    path: "{{ ansible_facts.env.HOME }}/.tmux/plugins"
+    path: "{{ ansible_facts.env.HOME }}/.local/share/tmux/plugins"
     state: directory
     mode: "0755"
 
@@ -17,6 +17,8 @@
   become: false
   ansible.builtin.git:
     repo: https://github.com/tmuxpack/tpack.git
-    dest: "{{ ansible_facts.env.HOME }}/.tmux/plugins/tpm"
+    dest: "{{ ansible_facts.env.HOME }}/.local/share/tmux/plugins/tpm"
     version: main
-    update: true
+    # Tpack updates itself from verified releases. Ansible owns the initial
+    # installation but must not reset a checkout that Tpack has updated.
+    update: false

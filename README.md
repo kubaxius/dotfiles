@@ -217,13 +217,15 @@ For example, run the laptop profile with:
 ANSIBLE_INVENTORY=ansible/inventories/laptop/inventory.yml ./bootstrap.sh
 ```
 
-The playbook also clones [Tpack](https://github.com/tmuxpack/tpack) to
-`~/.tmux/plugins/tpm`, which is Tpack's TPM-compatible Git-clone location.
-This checkout is idempotent: a first run clones Tpack and later runs update its
-`main` branch. Add Tpack-managed plugins as `set -g @plugin
-'owner/repository'` lines before the Tpack `run` line in
-`chezmoi/private_dot_config/tmux/tmux.conf`; reload tmux and press `prefix` +
-`I` to install them.
+The Ansible shell role installs [Tpack](https://github.com/tmuxpack/tpack) at
+`~/.local/share/tmux/plugins/tpm`; chezmoi owns only the tmux configuration.
+Tpack stores plugins alongside itself under `~/.local/share/tmux/plugins`,
+using stable aliases declared in `chezmoi/private_dot_config/tmux/tmux.conf`.
+
+Plugin updates are manual: reload tmux and press `prefix` + `U`, or run
+`~/.local/share/tmux/plugins/tpm/tpack update all`. Tpack itself checks for
+verified release updates automatically and can be checked immediately with
+`~/.local/share/tmux/plugins/tpm/tpack self-update`.
 
 ## Recommended test flow
 
