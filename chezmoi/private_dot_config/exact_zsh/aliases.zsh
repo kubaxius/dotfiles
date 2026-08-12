@@ -15,10 +15,26 @@ if [[ $- == *i* ]]; then
   }
 fi
 
+# ZSH #
+alias zsh-restart="clear; exec zsh"
+alias sudo='sudo ' # this makes aliases work for sudo
+
+
+# PYTHON #
 alias source-py="source .venv/bin/activate"
 alias unsource="deactivate"
-alias zsh-restart="clear; exec zsh"
-alias i="paru -S --needed"
-alias update="paru -Syu"
+
+# PACKAGE MANAGEMENT #
+alias i="paru -S" # install
+alias is="paru --color always -S --interactive" # search and install
+alias ui="paru -R" # uninstall
+alias uif="paru -Rns" # uninstall full (settings, dependencies)
+alias update="paru -Syu" # update all
+
+# FILE MANAGEMENT #
+alias rmr="rm -rI" # remove recursively, but ask
+alias lockr='sudo chmod 000 "${HOME}/rudein"'
+alias ulockr='sudo chmod 700 "${HOME}/rudein"'
+
 # kitty without the tmux
 alias bare-kitty='kitty env DISABLE_TMUX_AUTOSTART=1 zsh -l'
