@@ -1,4 +1,4 @@
-# Hyprland UWSM / Dotfiles Notes
+# Hyprland and UWSM
 
 This file records the session-management changes made while debugging
 Hypridle screen-off wake issues, Waybar crashes, and UWSM startup behavior.
