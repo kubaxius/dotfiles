@@ -1,23 +1,9 @@
-# The syntax of a Navi cheatsheet
+# Navi cheatsheet syntax
 
-This is a local quick reference for the syntax used by the cheatsheets in this
-directory. For configuration, path discovery, and features added by newer Navi
-versions, consult the
+This is the project's quick reference for syntax used by the cheatsheets under
+`chezmoi/dot_local/share/navi/exact_cheats/`. For configuration, path discovery,
+and features added by newer Navi versions, consult the
 [upstream syntax documentation](https://github.com/denisidoro/navi/blob/master/docs/cheatsheet/syntax/README.md).
-
-<!-- TOC -->
-
-- [The syntax of a Navi cheatsheet](#the-syntax-of-a-navi-cheatsheet)
-  - [Syntax overview](#syntax-overview)
-  - [Variables](#variables)
-    - [Advanced variable options](#advanced-variable-options)
-    - [Variable dependency](#variable-dependency)
-      - [Implicit dependencies](#implicit-dependencies)
-      - [Explicit dependencies](#explicit-dependencies)
-    - [Variable as multiple arguments](#variable-as-multiple-arguments)
-  - [Extending cheats](#extending-cheats)
-  - [Multiline commands/snippets](#multiline-commandssnippets)
-  - [Aliases](#aliases)
 
 ## Syntax overview
 

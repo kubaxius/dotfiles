@@ -1,22 +1,7 @@
-# Zsh Config
+# Zsh configuration
 
-- [Zsh Config](#zsh-config)
-  - [Layout](#layout)
-  - [How the modular loader works](#how-the-modular-loader-works)
-  - [`scripts.zsh` and startup helpers](#scriptszsh-and-startup-helpers)
-  - [Editing guidelines](#editing-guidelines)
-  - [Using Zinit in this setup](#using-zinit-in-this-setup)
-    - [Loading a normal plugin](#loading-a-normal-plugin)
-    - [Loading an Oh My Zsh plugin or snippet](#loading-an-oh-my-zsh-plugin-or-snippet)
-    - [Loading a Prezto snippet](#loading-a-prezto-snippet)
-  - [Resources](#resources)
-    - [Core docs](#core-docs)
-    - [Plugin and theme ecosystems](#plugin-and-theme-ecosystems)
-    - [Useful projects to browse](#useful-projects-to-browse)
-    - [General shell inspiration](#general-shell-inspiration)
-
-This directory contains a modular zsh setup intended to be managed as dotfiles.
-In the repo, chezmoi stores it under `chezmoi/private_dot_config/exact_zsh/`.
+This project contains a modular zsh setup intended to be managed as dotfiles.
+Chezmoi stores it under `chezmoi/private_dot_config/exact_zsh/`.
 The source file `chezmoi/dot_zshenv` becomes `~/.zshenv` and points Zsh at
 `~/.config/zsh`, where the interactive loader and configuration modules are
 deployed.
@@ -219,4 +204,5 @@ whole:
   zsh -f
   ```
 
-For broader dotfiles inspiration, see the repo root `README.md`.
+For the rest of the project documentation, see the
+[documentation index](../README.md).
