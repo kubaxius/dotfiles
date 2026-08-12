@@ -220,7 +220,9 @@ ANSIBLE_INVENTORY=ansible/inventories/laptop/inventory.yml ./bootstrap.sh
 The Ansible shell role installs [Tpack](https://github.com/tmuxpack/tpack) at
 `~/.local/share/tmux/plugins/tpm`; chezmoi owns only the tmux configuration.
 Tpack stores plugins alongside itself under `~/.local/share/tmux/plugins`,
-using stable aliases declared in `chezmoi/private_dot_config/tmux/tmux.conf`.
+using stable aliases declared in the ordered configuration fragments under
+`chezmoi/private_dot_config/tmux/conf.d`. The main `tmux.conf` loads those
+fragments in lexical order.
 
 Plugin updates are manual: reload tmux and press `prefix` + `U`, or run
 `~/.local/share/tmux/plugins/tpm/tpack update all`. Tpack itself checks for
