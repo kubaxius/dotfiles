@@ -37,4 +37,4 @@ alias lockr='sudo chmod 000 "${HOME}/rudein"'
 alias ulockr='sudo chmod 700 "${HOME}/rudein"'
 
 # kitty without the tmux
-alias bare-kitty='kitty env DISABLE_TMUX_AUTOSTART=1 zsh -l'
+alias bare-terminal='terminal env DISABLE_TMUX_AUTOSTART=1 zsh -l'

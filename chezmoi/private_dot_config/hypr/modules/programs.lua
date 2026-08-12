@@ -5,7 +5,7 @@
 -- Set programs that you use
 local programs = {
 	scripts_dir = "~/.config/hypr/scripts/",
-	terminal = "kitty",
+	terminal = "terminal",
 	fileManager = "dolphin",
 	menu_default = "hyprlauncher",
 	menu_rofi = [[rofi -show drun -run-command "uwsm app -- {cmd}"]],
