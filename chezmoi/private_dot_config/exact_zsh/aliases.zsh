@@ -33,8 +33,6 @@ alias update="paru -Syu" # update all
 
 # FILE MANAGEMENT #
 alias rmr="rm -rI" # remove recursively, but ask
-alias lockr='sudo chmod 000 "${HOME}/rudein"'
-alias ulockr='sudo chmod 700 "${HOME}/rudein"'
 
 # kitty without the tmux
 alias bare-terminal='terminal env DISABLE_TMUX_AUTOSTART=1 zsh -l'

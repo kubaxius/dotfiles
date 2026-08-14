@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+LOCK_DIR="${HOME}/rudein"
+CURRENT_PERMISSIONS=$(stat -c "%a" -- "${LOCK_DIR}")
+
+COLOR_UNLOCKED='\033[0;32m'
+COLOR_LOCKED='\033[0;31m'
+
+
+case $CURRENT_PERMISSIONS in
+    0) 
+        chmod 700 "${LOCK_DIR}"
+        echo -e "${COLOR_UNLOCKED}\ueb74 VAULT UNLOCKED \ueb74" ;;
+    *)
+        chmod 0 "${LOCK_DIR}"
+        echo -e "${COLOR_LOCKED}\uea75 VAULT LOCKED \uea75" ;;
+esac
