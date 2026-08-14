@@ -48,6 +48,7 @@ defineBindBlock("launchers", function()
 	bind(modBind("M"), uwsm.raw([[hyprshutdown --post-cmd "uwsm stop"]]))
 	bind(modBind("E"), uwsm.exec(programs.fileManager))
 	bind(modBind("R"), uwsm.exec(programs.menu))
+	bind(modBind("space"), uwsm.exec(programs.menu))
 	bind(modBind("period"), uwsm.exec(programs.emojis))
 end)
 
