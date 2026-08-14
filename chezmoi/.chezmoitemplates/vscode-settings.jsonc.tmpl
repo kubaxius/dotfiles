@@ -255,9 +255,9 @@
   "gitlens.ai.vscode.model": "lmstudio:lmstudio",
   "github.copilot.nextEditSuggestions.eagerness": "low",
   "window.newWindowProfile": "Default",
-//{{- if eq .profile "dotfiles" }}
+  //{{- if eq .profile "dotfiles" }}
   "workbench.colorTheme": "Solarized Dark",
-//{{- end }}
+  //{{- end }}
   "github.copilot.enable": {
     "*": false,
     "plaintext": false,
@@ -265,13 +265,13 @@
     "scminput": false
   },
   "yaml.disableSchemaDetection": [
-//{{- if ne .profile "dotfiles" }}
+    //{{- if ne .profile "dotfiles" }}
     "**/.github/workflows/*.yml",
     "**/.github/workflows/*.yaml",
     "**/.gitea/workflows/*.yml",
     "**/.gitea/workflows/*.yaml",
     "**/.forgejo/workflows/*.yml",
     "**/.forgejo/workflows/*.yaml"
-//{{- end }}
+    //{{- end }}
   ]
 }
