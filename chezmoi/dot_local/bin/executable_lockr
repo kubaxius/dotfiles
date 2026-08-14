@@ -6,7 +6,9 @@ CURRENT_PERMISSIONS=$(stat -c "%a" -- "${LOCK_DIR}")
 COLOR_UNLOCKED='\033[0;32m'
 COLOR_LOCKED='\033[0;31m'
 
-
+# TODO: Take options to force lock/unlock instead of toggling. 
+# TODO: Somehow use password to unlock
+# TODO: Autolock on startup
 case $CURRENT_PERMISSIONS in
     0) 
         chmod 700 "${LOCK_DIR}"
