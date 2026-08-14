@@ -1,0 +1,20 @@
+#!/bin/sh
+# Reload tmux after any change to it's config. #
+
+# run_onchange - Reruns this script after chezmoi apply and contents change.
+# That's why we generate sha256 sum of the edited files, to also force change here.
+# after - wait untill all file changes are applied.
+
+{{- range $path := glob (joinPath .chezmoi.sourceDir "private_dot_config/tmux/**") }}
+    {{- if not ($path | lstat).isDir }}
+    # {{ $path }}: {{ include $path | sha256sum }}
+    {{- end }}
+{{- end }}
+
+command -v tmux >/dev/null 2>&1 || exit 0
+tmux has-session 2>/dev/null || exit 0
+
+config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+tmux source-file "$config_home/tmux/tmux.conf"
+
+echo "Tmux reloaded"
