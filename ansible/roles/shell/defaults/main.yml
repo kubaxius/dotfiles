@@ -6,3 +6,4 @@ shell_packages:
   - navi # snippet manager
   - tmux # terminal multiplexer
   - entr # allows running scripts on file change
+  - eza # better ls
