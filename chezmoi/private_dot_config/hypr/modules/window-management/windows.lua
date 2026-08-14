@@ -52,8 +52,9 @@ hl.window_rule({
 	name = "firefox-pip",
 	match = { class = "firefox", title = "Picture-in-Picture" },
 
-	size = "400 225",
-	move = "monitor_w-20-400 20",
+	keep_aspect_ratio = true,
+	--size = "400 225",
+	move = "monitor_w-20-600 20",
 	pin = true,
 	float = true,
 })
