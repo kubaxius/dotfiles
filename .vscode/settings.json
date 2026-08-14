@@ -2,7 +2,8 @@
   "files.associations": {
     "**/dot_local/bin/**": "shellscript",
     "**/private_dot_config/exact_zsh/dot_zshrc": "zsh",
-    "**/private_dot_config/tmux/conf.d/**": "tmux"
+    "**/private_dot_config/tmux/conf.d/**": "tmux",
+    "**/*.jsonc.tmpl": "jsonc"
   },
 
   "VsCodeTaskButtons.tasks": [
