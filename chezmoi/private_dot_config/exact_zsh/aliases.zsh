@@ -32,13 +32,15 @@ alias uif="paru -Rns" # uninstall full (settings, dependencies)
 alias update="paru -Syu" # update all
 
 # FILE MANAGEMENT #
+alias tp="trash-put"
 alias rmr="rm -rI" # remove recursively, but ask
-alias lsl='ls -lhA --color=auto' # make ls colored
-alias ls='ls --color=auto' # make ls colored
 
-alias l='eza --icons=auto --group-directories-first'
-alias ll='eza -lah --icons=auto --group-directories-first --git --header'
-alias lt='eza --tree --level=2 --icons=auto --group-directories-first'
+
+alias lsl='ls -lhA --color=auto' # table, human-readable and all files
+alias ls='ls --color=auto' # make ls colored
+alias l='eza --icons=auto --group-directories-first' # simple list with icons, dirs first
+alias ll='eza -lah --icons=auto --group-directories-first --git --header' # table, all files, human readable, icons dirs first
+alias lt='eza --tree --level=2 --icons=auto --group-directories-first' # directory tree
 
 # kitty without the tmux
 alias bare-terminal='terminal env DISABLE_TMUX_AUTOSTART=1 zsh -l'
