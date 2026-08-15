@@ -46,6 +46,11 @@
 
   "workbench.tree.indent": 16,
   "workbench.tree.renderIndentGuides": "always",
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "comments.openView": "never",
+  // {{ if eq .profile "dotfiles" }}
+  "workbench.colorTheme": "Solarized Dark",
+  // {{ end }}
 
   // =========================
   // Global editor behavior
@@ -54,7 +59,9 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.linkedEditing": true,
   "editor.mouseWheelZoom": true,
+  "editor.fontSize": 16,
   "window.controlsStyle": "hidden",
+  "window.newWindowProfile": "Default",
 
   // =========================
   // Editor font
@@ -84,6 +91,9 @@
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "prettier.trailingComma": "none"
+  },
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
   },
   "[svg]": {
     "editor.defaultFormatter": "jock.svg"
@@ -139,6 +149,7 @@
       "siblings_only": true
     }
   },
+  "markdown-preview-enhanced.previewTheme": "atom-dark.css",
 
   // =========================
   // Terminal
@@ -146,13 +157,38 @@
 
   // defaults to editor font
   //"terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font', monospace",
-  "terminal.integrated.env.linux": {},
+  "terminal.integrated.env.linux": {
+    "DISABLE_TMUX_AUTOSTART": "1"
+  },
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "bash",
+      "icon": "terminal-bash"
+    },
+    "zsh": {
+      "path": "/usr/bin/zsh"
+    },
+    "fish": {
+      "path": "fish"
+    },
+    "tmux": {
+      "path": "tmux",
+      "icon": "terminal-tmux"
+    },
+    "pwsh": {
+      "path": "pwsh",
+      "icon": "terminal-powershell"
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "zsh",
 
   // =========================
   // Git
   // =========================
   "git.autofetch": true,
   "git.confirmSync": false,
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "lmstudio:lmstudio",
 
   // =========================
   // Suggestions & IntelliSense
@@ -206,11 +242,25 @@
     "postcss": "css"
   },
   "css.validate": true,
+
+  // =========================
+  // AI assistants
+  // =========================
   "chat.agent.enabled": false,
-  "telemetry.telemetryLevel": "off",
+  "chat.viewSessions.orientation": "stacked",
   "claude-history.cloudSync.enableDetailedStats": true,
   "claude-history.database.storeMessages": true,
-  "security.workspace.trust.untrustedFiles": "open",
+  "github.copilot.nextEditSuggestions.eagerness": "low",
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false
+  },
+
+  // =========================
+  // JSON and YAML schemas
+  // =========================
   "json.schemaDownload.trustedDomains": {
     "https://developer.microsoft.com/json-schemas/": true,
     "https://json-schema.org/": true,
@@ -221,57 +271,29 @@
     "https://schemastore.azurewebsites.net/": true,
     "https://www.schemastore.org/": true
   },
-  "comments.openView": "never",
-  "terminal.integrated.profiles.linux": {
-    "bash": {
-      "path": "bash",
-      "icon": "terminal-bash"
-    },
-    "zsh": {
-      "path": "/usr/bin/zsh"
-    },
-    "fish": {
-      "path": "fish"
-    },
-    "tmux": {
-      "path": "tmux",
-      "icon": "terminal-tmux"
-    },
-    "pwsh": {
-      "path": "pwsh",
-      "icon": "terminal-powershell"
-    }
-  },
-  "terminal.integrated.defaultProfile.linux": "zsh",
-  "editor.fontSize": 16,
-  "markdown-preview-enhanced.previewTheme": "atom-dark.css",
-  "workbench.secondarySideBar.defaultVisibility": "hidden",
-  "[xml]": {
-    "editor.defaultFormatter": "redhat.vscode-xml"
-  },
-  "chat.viewSessions.orientation": "stacked",
-  "go.toolsManagement.autoUpdate": true,
-  "gitlens.ai.model": "vscode",
-  "gitlens.ai.vscode.model": "lmstudio:lmstudio",
-  "github.copilot.nextEditSuggestions.eagerness": "low",
-  "window.newWindowProfile": "Default",
-  //{{- if eq .profile "dotfiles" }}
-  "workbench.colorTheme": "Solarized Dark",
-  //{{- end }}
-  "github.copilot.enable": {
-    "*": false,
-    "plaintext": false,
-    "markdown": false,
-    "scminput": false
-  },
+  // {{ if ne .profile "dotfiles" }}
   "yaml.disableSchemaDetection": [
-    //{{- if ne .profile "dotfiles" }}
     "**/.github/workflows/*.yml",
     "**/.github/workflows/*.yaml",
     "**/.gitea/workflows/*.yml",
     "**/.gitea/workflows/*.yaml",
     "**/.forgejo/workflows/*.yml",
     "**/.forgejo/workflows/*.yaml"
-    //{{- end }}
-  ]
+  ],
+  // {{ end }}
+
+  // =========================
+  // Language tooling
+  // =========================
+  "go.toolsManagement.autoUpdate": true,
+  // {{ if ne .profile "dotfiles" }}
+  "ansible.lightspeed.enabled": false,
+  "cSpell.userWords": ["rebuildable"],
+  // {{ end }}
+
+  // =========================
+  // Privacy and security
+  // =========================
+  "telemetry.telemetryLevel": "off",
+  "security.workspace.trust.untrustedFiles": "open"
 }
