@@ -35,6 +35,21 @@ alias update="paru -Syu" # update all
 alias tp="trash-put"
 alias rmr="rm -rI" # remove recursively, but ask
 
+# Create files and directories in one command.
+# A trailing slash means “directory”; otherwise, “file”.
+mk() {
+  local target
+
+  for target in "$@"; do
+    if [[ "$target" == */ ]]; then
+      mkdir -p -- "$target"
+    else
+      mkdir -p -- "${target:h}"
+      touch -- "$target"
+    fi
+  done
+}
+
 
 alias lsl='ls -lhA --color=auto' # table, human-readable and all files
 alias ls='ls --color=auto' # make ls colored
