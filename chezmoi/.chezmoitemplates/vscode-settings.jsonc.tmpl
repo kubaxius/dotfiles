@@ -257,6 +257,69 @@
     "markdown": false,
     "scminput": false
   },
+  "acp.agents": {
+    "GitHub Copilot": {
+      "command": "npx",
+      "args": ["@github/copilot-language-server@latest", "--acp"],
+      "env": {}
+    },
+    "Claude Code": {
+      "command": "npx",
+      "args": ["@agentclientprotocol/claude-agent-acp@latest"],
+      "env": {}
+    },
+    "Gemini CLI": {
+      "command": "npx",
+      "args": ["@google/gemini-cli@latest", "--experimental-acp"],
+      "env": {}
+    },
+    "Qwen Code": {
+      "command": "npx",
+      "args": ["@qwen-code/qwen-code@latest", "--acp", "--experimental-skills"],
+      "env": {}
+    },
+    "Auggie CLI": {
+      "command": "npx",
+      "args": ["@augmentcode/auggie@latest", "--acp"],
+      "env": {
+        "AUGMENT_DISABLE_AUTO_UPDATE": "1"
+      }
+    },
+    "Qoder CLI": {
+      "command": "npx",
+      "args": ["@qoder-ai/qodercli@latest", "--acp"],
+      "env": {}
+    },
+    "Codex CLI": {
+      "command": "npx",
+      "args": ["@zed-industries/codex-acp@latest"],
+      "env": {}
+    },
+    "OpenCode": {
+      "command": "npx",
+      "args": ["opencode-ai@latest", "acp"],
+      "env": {}
+    },
+    "OpenClaw": {
+      "command": "npx",
+      "args": ["openclaw", "acp"],
+      "env": {}
+    },
+    "Kiro CLI": {
+      "command": "kiro-cli",
+      "args": ["acp"],
+      "env": {}
+    },
+    "Hermes Agent": {
+      "command": "hermes",
+      "args": ["acp"],
+      "env": {}
+    },
+    "OC": {
+      "command": "/usr/bin/opencode",
+      "args": ["acp"]
+    }
+  },
 
   // =========================
   // JSON and YAML schemas
@@ -270,6 +333,11 @@
     "https://raw.githubusercontent.com/microsoft/vscode/": true,
     "https://schemastore.azurewebsites.net/": true,
     "https://www.schemastore.org/": true
+  },
+  "yaml.schemas": {
+    "file:///home/kubaxius/.vscode/extensions/continue.continue-2.0.0-linux-x64/config-yaml-schema.json": [
+      ".continue/**/*.yaml"
+    ]
   },
   // {{ if ne .profile "dotfiles" }}
   "yaml.disableSchemaDetection": [
