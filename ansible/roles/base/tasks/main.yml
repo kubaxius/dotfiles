@@ -19,3 +19,4 @@
     name: "{{ base_packages }}"
     state: present
   when: ansible_facts.os_family == "RedHat"
+# TODO: Add journald max storage settings, like on VPS, but 1GB instead of 500MB
