@@ -100,7 +100,7 @@
   },
 
   "[python]": {
-    "editor.defaultFormatter": "mikoz.black-py"
+    "editor.defaultFormatter": "ms-python.black-formatter"
   },
 
   "[csharp]": {
@@ -246,6 +246,7 @@
   // =========================
   // AI assistants
   // =========================
+  "ansible.lightspeed.enabled": false,
   "chat.agent.enabled": false,
   "chat.viewSessions.orientation": "stacked",
   "claude-history.cloudSync.enableDetailedStats": true,
@@ -339,7 +340,6 @@
       ".continue/**/*.yaml"
     ]
   },
-  // {{ if ne .profile "dotfiles" }}
   "yaml.disableSchemaDetection": [
     "**/.github/workflows/*.yml",
     "**/.github/workflows/*.yaml",
@@ -348,16 +348,12 @@
     "**/.forgejo/workflows/*.yml",
     "**/.forgejo/workflows/*.yaml"
   ],
-  // {{ end }}
 
   // =========================
   // Language tooling
   // =========================
   "go.toolsManagement.autoUpdate": true,
-  // {{ if ne .profile "dotfiles" }}
-  "ansible.lightspeed.enabled": false,
   "cSpell.userWords": ["rebuildable"],
-  // {{ end }}
 
   // =========================
   // Privacy and security
