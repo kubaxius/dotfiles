@@ -100,7 +100,8 @@
   },
 
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.inlayHints.enabled": "offUnlessPressed"
   },
 
   "[csharp]": {
@@ -144,11 +145,6 @@
   // Markdown Lint rules
   // =========================
 
-  "markdownlint.config": {
-    "MD024": {
-      "siblings_only": true
-    }
-  },
   "markdown-preview-enhanced.previewTheme": "atom-dark.css",
 
   // =========================
@@ -340,14 +336,6 @@
       ".continue/**/*.yaml"
     ]
   },
-  "yaml.disableSchemaDetection": [
-    "**/.github/workflows/*.yml",
-    "**/.github/workflows/*.yaml",
-    "**/.gitea/workflows/*.yml",
-    "**/.gitea/workflows/*.yaml",
-    "**/.forgejo/workflows/*.yml",
-    "**/.forgejo/workflows/*.yaml"
-  ],
 
   // =========================
   // Language tooling
@@ -359,5 +347,10 @@
   // Privacy and security
   // =========================
   "telemetry.telemetryLevel": "off",
-  "security.workspace.trust.untrustedFiles": "open"
+  "security.workspace.trust.untrustedFiles": "open",
+
+  // =========================
+  // SQL Tools
+  // =========================
+  "sqltools.useNodeRuntime": true
 }
