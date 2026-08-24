@@ -94,16 +94,12 @@ end
 ---- WORKSPACE 5 - BROWSER ----
 -------------------------------
 hl.workspace_rule({
-	default_name = "5 Browser",
+	default_name = "5",
 	workspace = workspaceMap.selector(5),
 	persistent = true,
-	default = true,
 })
 local function setup_workspace_5()
-	-- Make default
-	hl.dispatch(hl.dsp.focus({ workspace = workspaceMap.physical(5) }))
 	-- Programs to launch
-	uwsm.start_with_rules(programs.browser, "firefox", { workspace = workspaceMap.selector(5, "silent") })
 end
 
 ---------------------
@@ -122,12 +118,16 @@ end
 ---- WORKSPACE 7 ----
 ---------------------
 hl.workspace_rule({
-	default_name = "7",
+	default_name = "7 Browser",
 	workspace = workspaceMap.selector(7),
 	persistent = true,
+	default = true,
 })
 local function setup_workspace_7()
+	-- Make default
+	hl.dispatch(hl.dsp.focus({ workspace = workspaceMap.physical(7) }))
 	-- Programs to launch
+	uwsm.start_with_rules(programs.browser, "firefox", { workspace = workspaceMap.selector(7, "silent") })
 end
 
 -----------------------------
