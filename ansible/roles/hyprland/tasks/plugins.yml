@@ -176,6 +176,15 @@
     - never
     - hyprland-plugin-update
   block:
+    # Keep the update-only tag usable when a distribution package split moves
+    # hyprpm out of the main Hyprland package. The normal full playbook also
+    # owns this package through hyprland_plugin_build_packages.
+    - name: Ensure the Hyprland plugin manager is installed
+      become: true
+      community.general.pacman:
+        name: hyprpm
+        state: present
+
     - name: Allow hyprpm to update its root-owned cache
       become: true
       community.general.sudoers:

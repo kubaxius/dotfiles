@@ -68,6 +68,8 @@ hyprland_plugin_build_packages:
   - cmake
   - gcc
   - git
+  # Arch packages the plugin manager separately from Hyprland as of 0.56.2-3.
+  - hyprpm
   - meson
 
 # Plugins are shared by every Hyprland workstation. `repository_name` is the

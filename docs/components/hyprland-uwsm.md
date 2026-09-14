@@ -217,5 +217,13 @@ Aquamarine ABI change even when the Hyprland commit stays the same.
 
 Run `hyprpm update --force` from an interactive terminal and complete its
 sudo prompts, then run `hyprpm reload`. The Ansible
-`hyprland-plugin-update` tag also forces header and plugin rebuilding.
+`hyprland-plugin-update` tag installs the separately packaged `hyprpm` tool if
+needed and forces header and plugin rebuilding.
+
+```sh
+ansible-playbook -K -i ansible/inventories/deimos/inventory.yml \
+  ansible/playbook.yml --tags hyprland-plugin-update
+hyprpm reload
+```
+
 Verify with `hyprctl plugin list` and `hyprctl configerrors`.
