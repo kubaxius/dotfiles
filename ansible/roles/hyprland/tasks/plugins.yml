@@ -196,6 +196,9 @@
         argv:
           - hyprpm
           - update
+          # Dependency ABI changes can leave cached headers stale even when
+          # the Hyprland commit is unchanged. Explicit updates must rebuild.
+          - --force
       changed_when: true
 
   always:
