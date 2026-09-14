@@ -85,6 +85,8 @@ hyprland_plugins:
 hyprland_workstation_features: []
 
 hyprland_feature_packages:
+  tablet_display:
+    - sunshine-bin
   corsair:
     - ckb-next-git
   razer:
@@ -118,6 +120,7 @@ hyprland_system_services:
   - NetworkManager.service
 
 hyprland_feature_system_services:
+  tablet_display: []
   corsair:
     - ckb-next-daemon.service
   razer: []
@@ -126,6 +129,7 @@ hyprland_feature_system_services:
   media_apps: []
 
 hyprland_feature_user_services:
+  tablet_display: []
   corsair:
     - ckb-next.service
   razer:
@@ -134,6 +138,7 @@ hyprland_feature_user_services:
   media_apps: []
 
 hyprland_feature_flatpaks:
+  tablet_display: []
   corsair: []
   razer:
     - name: xyz.z3ntu.razergenie

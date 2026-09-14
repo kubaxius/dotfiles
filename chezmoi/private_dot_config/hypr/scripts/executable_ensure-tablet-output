@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if hyprctl monitors all -j |
+  jq -e '.[] | select(.name == "HEADLESS-1")' >/dev/null; then
+  exit 0
+fi
+
+hyprctl output create headless

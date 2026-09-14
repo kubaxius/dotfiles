@@ -14,3 +14,13 @@ workstation_features:
   - corsair
   - razer
   - media_apps
+  - tablet_display
+
+tablet_display:
+  output: HEADLESS-1
+  mode: 1280x800@60
+  position: 0x1440
+  scale: 1
+  render_device: /dev/dri/renderD128
+  network_interface: enp17s0u5u4u1
+  connection_name: tablet-android-usb

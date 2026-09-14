@@ -45,7 +45,7 @@ bind(modBind("SHIFT + A"), animationMode.toggle_mode, { submap_universal = true 
 defineBindBlock("launchers", function()
 	bind(modBind("Q"), uwsm.exec(programs.terminal))
 	-- TODO: Implement a shutdown menu
-	bind(modBind("M"), uwsm.raw([[hyprshutdown --post-cmd "uwsm stop"]]))
+	bind(modBind("M"), uwsm.raw([[hyprshutdown --post-cmd "uwsm stop && adb shell input keyevent 223"]]))
 	bind(modBind("E"), uwsm.exec(programs.fileManager))
 	bind(modBind("R"), uwsm.exec(programs.menu))
 	bind(modBind("space"), uwsm.exec(programs.menu))

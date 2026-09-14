@@ -13,6 +13,15 @@ hl.config({
 			natural_scroll = false,
 		},
 	},
+	cursor = {
+		hide_on_touch = true,
+		--warp_back_after_non_mouse_input = true,
+	},
+})
+
+hl.device({
+	name = "libvirtualhid-touchscreen",
+	output = "HEADLESS-1",
 })
 
 local function mouse_device(name)

@@ -14,7 +14,7 @@ hl.monitor({
 hl.monitor({
 	output = "HEADLESS-1",
 	mode = "1280x800@60",
-	position = "0x1440",
+	position = "0x2000", -- Does not touch the screen
 	scale = 1,
 })
 
