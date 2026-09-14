@@ -44,7 +44,7 @@ hl.config({
 			enabled = true,
 			range = 15,
 			render_power = 3,
-			color = "#FFC580A4",
+			color = "#FFFFFF24",
 			color_inactive = "#000000aa",
 		},
 	},
