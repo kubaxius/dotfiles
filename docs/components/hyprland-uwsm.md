@@ -207,3 +207,15 @@ behavior. The UWSM/systemd changes mainly make session processes recoverable
 and easier to inspect. If the screen still sometimes does not wake, continue
 with kernel/AMDGPU/display-link diagnostics rather than assuming Waybar or
 Hypridle is the only cause.
+
+### Repairing plugins after dependency upgrades
+
+Check `hyprctl plugin list`, not only `hyprpm list`: enabled plugins may
+still fail to load, and hyprpm can report success despite a plugin's own
+version check rejecting it. Cached headers can become stale after an
+Aquamarine ABI change even when the Hyprland commit stays the same.
+
+Run `hyprpm update --force` from an interactive terminal and complete its
+sudo prompts, then run `hyprpm reload`. The Ansible
+`hyprland-plugin-update` tag also forces header and plugin rebuilding.
+Verify with `hyprctl plugin list` and `hyprctl configerrors`.
