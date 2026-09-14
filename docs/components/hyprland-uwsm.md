@@ -29,15 +29,15 @@ Use package-provided user units by default. A unit in
 
 Current intended persistent units:
 
-| Unit | Origin | Enabled |
-| --- | --- | --- |
-| `hyprpaper.service` | package | yes |
-| `hypridle.service` | package | yes |
-| `waybar.service` | package | yes |
-| `swaync.service` | package | yes |
-| `hyprpolkitagent.service` | package | yes |
-| `nm-applet.service` | package | yes |
-| `xsettingsd.service` | package | yes |
+| Unit                      | Origin  | Enabled |
+| ------------------------- | ------- | ------- |
+| `hyprpaper.service`       | package | yes     |
+| `hypridle.service`        | package | yes     |
+| `waybar.service`          | package | yes     |
+| `swaync.service`          | package | yes     |
+| `hyprpolkitagent.service` | package | yes     |
+| `nm-applet.service`       | package | yes     |
+| `xsettingsd.service`      | package | yes     |
 
 ## Launch Policy
 
@@ -67,9 +67,9 @@ Current intended persistent units:
 
 ```lua
 hl.on("hyprland.start", function()
-	uwsm.start_raw("hyprpm reload")
-	-- Update the activation environment, then set up workspace applications.
-	workspaces.setup_workspaces()
+  uwsm.start_raw("hyprpm reload")
+  -- Update the activation environment, then set up workspace applications.
+  workspaces.setup_workspaces()
 end)
 ```
 
