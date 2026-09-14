@@ -47,6 +47,7 @@ local M = {}
 ---------------------
 hl.workspace_rule({
 	default_name = "1 Code 1",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(1),
 	persistent = true,
 })
@@ -59,6 +60,7 @@ end
 ---------------------
 hl.workspace_rule({
 	default_name = "2 Code 2",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(2),
 	persistent = true,
 })
@@ -71,6 +73,7 @@ end
 ---------------------
 hl.workspace_rule({
 	default_name = "3 Code 3",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(3),
 	persistent = true,
 })
@@ -83,6 +86,7 @@ end
 ---------------------
 hl.workspace_rule({
 	default_name = "4 Discord",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(4),
 	persistent = true,
 })
@@ -95,6 +99,7 @@ end
 -------------------------------
 hl.workspace_rule({
 	default_name = "5",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(5),
 	persistent = true,
 })
@@ -107,6 +112,7 @@ end
 ---------------------
 hl.workspace_rule({
 	default_name = "6 Steam",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(6),
 	persistent = true,
 })
@@ -119,6 +125,7 @@ end
 ---------------------
 hl.workspace_rule({
 	default_name = "7 Browser",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(7),
 	persistent = true,
 	default = true,
@@ -135,6 +142,7 @@ end
 -----------------------------
 hl.workspace_rule({
 	default_name = "8 Notes",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(8),
 	persistent = true,
 })
@@ -151,6 +159,7 @@ end
 -----------------------------
 hl.workspace_rule({
 	default_name = "9 Music",
+	monitor = "HDMI-A-1",
 	workspace = workspaceMap.selector(9),
 	persistent = true,
 })
@@ -169,6 +178,20 @@ local function setup_workspace_9()
 	uwsm.start(programs.music, "tidal")
 end
 
+------------------------------
+---- WORKSPACE T - TABLET ----
+------------------------------
+hl.workspace_rule({
+	default_name = "10 Tablet",
+	monitor = "HEADLESS-1",
+	workspace = "10",
+	persistent = true,
+	default = true,
+})
+local function setup_workspace_t()
+	-- Programs to launch
+end
+
 function M.setup_workspaces()
 	setup_workspace_1()
 	setup_workspace_2()
@@ -179,6 +202,7 @@ function M.setup_workspaces()
 	setup_workspace_7()
 	setup_workspace_8()
 	setup_workspace_9()
+	setup_workspace_t()
 end
 
 return M

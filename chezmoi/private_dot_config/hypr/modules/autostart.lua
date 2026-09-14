@@ -25,5 +25,9 @@ hl.on("hyprland.start", function()
 			.. "QT_QPA_PLATFORMTHEME "
 			.. "QT_STYLE_OVERRIDE"
 	)
+
+	-- Create the virtual tablet output once per Hyprland session.
+	uwsm.start_raw("hyprctl output create headless")
+
 	workspaces.setup_workspaces()
 end)
