@@ -13,6 +13,7 @@ local programs = {
 	browser = "firefox",
 	notes = "obsidian",
 	music = "flatpak run com.mastermindzh.tidal-hifi",
+	music_mpris = "tidal-hifi",
 	emojis = "rofimoji --selector rofi --action clipboard --clipboarder wl-copy --typer wtype --files emojis",
 }
 
