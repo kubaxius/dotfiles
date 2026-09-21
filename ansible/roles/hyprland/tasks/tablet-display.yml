@@ -1,0 +1,24 @@
+---
+- name: Validate tablet display configuration
+  ansible.builtin.assert:
+    that:
+      - tablet_display.adb_serial | default('') | length > 0
+      - tablet_display.output | default('') | length > 0
+      - tablet_display.moonlight.computer_name | default('') | length > 0
+      - tablet_display.moonlight.computer_uuid | default('') | length > 0
+      - tablet_display.moonlight.app_id is defined
+      - tablet_display.moonlight.app_name | default('') | length > 0
+      - tablet_display.moonlight.hdr is defined
+    fail_msg: tablet_display requires ADB, output, and Moonlight shortcut values.
+
+- name: Create the Hyprland configuration directory
+  ansible.builtin.file:
+    path: '{{ ansible_facts["env"]["HOME"] }}/.config/hypr'
+    state: directory
+    mode: "0700"
+
+- name: Render tablet display runtime configuration
+  ansible.builtin.template:
+    src: tablet-display.conf.j2
+    dest: '{{ ansible_facts["env"]["HOME"] }}/.config/hypr/tablet-display.conf'
+    mode: "0600"

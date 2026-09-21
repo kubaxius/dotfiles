@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Disables the desktop displays and puts the configured tablet to sleep on idle.
+set -u
+
+# Load tablet settings, falling back to the known output without targeting any tablet.
+config_file="${TABLET_DISPLAY_CONFIG:-$HOME/.config/hypr/tablet-display.conf}"
+if [[ -r "$config_file" ]]; then
+  # shellcheck source=/dev/null
+  source "$config_file"
+else
+  TABLET_OUTPUT=HEADLESS-1
+  TABLET_ADB_SERIAL=
+fi
+
+# Disable the physical monitor and power down the virtual tablet output.
+if command -v hyprctl >/dev/null 2>&1; then
+  hyprctl eval 'hl.monitor({ output = "HDMI-A-1", disabled = true })' >/dev/null 2>&1 || true
+  hyprctl dispatch "hl.dsp.dpms({ action = \"disable\", monitor = \"$TABLET_OUTPUT\" })" >/dev/null 2>&1 || true
+fi
+
+# Send Android's sleep key only to the configured tablet.
+if [[ -n "$TABLET_ADB_SERIAL" ]] && command -v adb >/dev/null 2>&1; then
+  adb -s "$TABLET_ADB_SERIAL" shell input keyevent 223 >/dev/null 2>&1 || true
+fi

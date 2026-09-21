@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Requests system hibernation when invoked by a future hypridle listener.
+set -u
+
+# Replace the helper process with systemctl and propagate its result to hypridle.
+exec systemctl hibernate

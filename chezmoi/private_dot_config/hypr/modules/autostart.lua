@@ -26,7 +26,7 @@ hl.on("hyprland.start", function()
 			.. "QT_STYLE_OVERRIDE"
 	)
 
-	-- Create the virtual tablet output once per Hyprland session.
+	-- Create the virtual tablet output when the configured tablet is present at session start.
 	uwsm.start_raw(
 		"dbus-update-activation-environment --systemd "
 			.. "WAYLAND_DISPLAY "
@@ -35,9 +35,7 @@ hl.on("hyprland.start", function()
 			.. "XDG_CURRENT_DESKTOP "
 			.. "XDG_SESSION_DESKTOP "
 			.. "XDG_SESSION_TYPE "
-			.. "&& ~/.config/hypr/scripts/ensure-tablet-output "
-			.. "&& sleep 2 "
-			.. "&& systemctl --user restart app-dev.lizardbyte.app.Sunshine.service"
+			.. "&& ~/.config/hypr/scripts/tablet-output-create"
 	)
 
 	workspaces.setup_workspaces()

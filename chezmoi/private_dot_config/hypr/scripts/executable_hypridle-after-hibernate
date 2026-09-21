@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Restores display power and focus after the system resumes from hibernation.
+set -u
+
+# A missing Hyprland control client means there is no active display state to restore.
+command -v hyprctl >/dev/null 2>&1 || exit 0
+
+# Power all outputs back on, wait for them to settle, and focus the main monitor.
+hyprctl dispatch 'hl.dsp.dpms({ action = "enable" })' >/dev/null 2>&1 || true
+sleep 1
+hyprctl dispatch 'hl.dsp.focus({ monitor = "HDMI-A-1" })' >/dev/null 2>&1 || true

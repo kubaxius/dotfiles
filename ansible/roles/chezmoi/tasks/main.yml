@@ -25,5 +25,11 @@
 - name: Apply chezmoi dotfiles for the current user
   become: false
   ansible.builtin.command:
-    cmd: "chezmoi apply --source {{ chezmoi_source_dir | quote }} --verbose"
+    # Ansible has no interactive TTY. The preceding diff exposes every change,
+    # then --force applies the repository state without prompting on conflicts.
+    cmd: >-
+      chezmoi apply
+      --source {{ chezmoi_source_dir | quote }}
+      --verbose
+      --force
   changed_when: chezmoi_diff.stdout | length > 0

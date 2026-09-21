@@ -1,0 +1,8 @@
+# Managed by Ansible. Sourced by the Hyprland tablet helper scripts.
+TABLET_ADB_SERIAL={{ tablet_display.adb_serial | quote }}
+TABLET_OUTPUT={{ tablet_display.output | quote }}
+TABLET_MOONLIGHT_COMPUTER_NAME={{ tablet_display.moonlight.computer_name | quote }}
+TABLET_MOONLIGHT_COMPUTER_UUID={{ tablet_display.moonlight.computer_uuid | quote }}
+TABLET_MOONLIGHT_APP_ID={{ tablet_display.moonlight.app_id | quote }}
+TABLET_MOONLIGHT_APP_NAME={{ tablet_display.moonlight.app_name | quote }}
+TABLET_MOONLIGHT_HDR={{ tablet_display.moonlight.hdr | ternary('true', 'false') | quote }}

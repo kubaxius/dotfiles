@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Cleans up the tablet display and then stops the active UWSM session.
+set -u
+
+# Load the target tablet identity when this host has tablet support configured.
+config_file="${TABLET_DISPLAY_CONFIG:-$HOME/.config/hypr/tablet-display.conf}"
+if [[ -r "$config_file" ]]; then
+  # shellcheck source=/dev/null
+  source "$config_file"
+
+  # Put only the configured tablet to sleep before the graphical session exits.
+  if command -v adb >/dev/null 2>&1; then
+    adb -s "$TABLET_ADB_SERIAL" shell input keyevent 223 >/dev/null 2>&1 || true
+  fi
+fi
+
+# Remove the virtual output while Hyprland is still available to service the request.
+"$HOME/.config/hypr/scripts/tablet-output-destroy" || true
+
+# Replace this helper with the session stop command so its status is propagated.
+exec uwsm stop

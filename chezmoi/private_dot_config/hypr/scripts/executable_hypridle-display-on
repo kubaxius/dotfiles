@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Re-enables the desktop displays and wakes the configured tablet after idle.
+set -u
+
+# Load tablet settings, falling back to the known output without targeting any tablet.
+config_file="${TABLET_DISPLAY_CONFIG:-$HOME/.config/hypr/tablet-display.conf}"
+if [[ -r "$config_file" ]]; then
+  # shellcheck source=/dev/null
+  source "$config_file"
+else
+  TABLET_OUTPUT=HEADLESS-1
+  TABLET_ADB_SERIAL=
+fi
+
+# Restore both outputs, allow them to settle, and return focus to the physical monitor.
+if command -v hyprctl >/dev/null 2>&1; then
+  hyprctl eval 'hl.monitor({ output = "HDMI-A-1", disabled = false })' >/dev/null 2>&1 || true
+  hyprctl dispatch "hl.dsp.dpms({ action = \"enable\", monitor = \"$TABLET_OUTPUT\" })" >/dev/null 2>&1 || true
+  sleep 1
+  hyprctl dispatch 'hl.dsp.focus({ monitor = "HDMI-A-1" })' >/dev/null 2>&1 || true
+fi
+
+# Wake the configured Android tablet and dismiss its keyguard.
+if [[ -n "$TABLET_ADB_SERIAL" ]] && command -v adb >/dev/null 2>&1; then
+  adb -s "$TABLET_ADB_SERIAL" shell input keyevent 224 >/dev/null 2>&1 || true
+  sleep 0.5
+  adb -s "$TABLET_ADB_SERIAL" shell wm dismiss-keyguard >/dev/null 2>&1 || true
+fi
+
+# Reopen the configured Moonlight shortcut after waking and unlocking the tablet.
+"$HOME/.config/hypr/scripts/tablet-start-stream" || true

@@ -16,3 +16,7 @@
 
 - name: Configure Flathub applications
   ansible.builtin.import_tasks: flathub.yml
+
+- name: Configure the tablet display integration
+  ansible.builtin.import_tasks: tablet-display.yml
+  when: "'tablet_display' in hyprland_workstation_features"

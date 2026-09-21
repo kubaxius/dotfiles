@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Opens the configured Sunshine desktop shortcut in Moonlight on the ADB tablet.
+set -u
+
+# Load the tablet identity and host-specific Moonlight shortcut metadata.
+config_file="${TABLET_DISPLAY_CONFIG:-$HOME/.config/hypr/tablet-display.conf}"
+[[ -r "$config_file" ]] || exit 0
+# shellcheck source=/dev/null
+source "$config_file"
+
+# Starting the stream is optional when ADB or the configured tablet is unavailable.
+command -v adb >/dev/null 2>&1 || exit 0
+[[ "$(adb -s "$TABLET_ADB_SERIAL" get-state 2>/dev/null)" == device ]] || exit 0
+
+# Ask Moonlight's shortcut trampoline to connect to the configured desktop app.
+adb -s "$TABLET_ADB_SERIAL" shell am start \
+  -a android.intent.action.VIEW \
+  -n com.limelight/.ShortcutTrampoline \
+  --es Name "$TABLET_MOONLIGHT_COMPUTER_NAME" \
+  --es UUID "$TABLET_MOONLIGHT_COMPUTER_UUID" \
+  --ei AppId "$TABLET_MOONLIGHT_APP_ID" \
+  --es AppName "$TABLET_MOONLIGHT_APP_NAME" \
+  --ez HDR "$TABLET_MOONLIGHT_HDR" \
+  >/dev/null 2>&1 || true

@@ -17,7 +17,14 @@ workstation_features:
   - tablet_display
 
 tablet_display:
+  adb_serial: HPV50R5L
   output: HEADLESS-1
+  moonlight:
+    computer_name: Deimos
+    computer_uuid: A70B0D20-CBE3-5022-2F0B-C1CDDC4E4025
+    app_id: 881448767
+    app_name: Desktop
+    hdr: false
   mode: 1280x800@60
   position: 0x1440
   scale: 1

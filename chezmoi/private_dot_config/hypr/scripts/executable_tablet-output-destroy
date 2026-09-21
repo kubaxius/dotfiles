@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Removes the configured headless tablet output when it currently exists.
+set -u
+
+# Load the output name rendered for this host.
+config_file="${TABLET_DISPLAY_CONFIG:-$HOME/.config/hypr/tablet-display.conf}"
+[[ -r "$config_file" ]] || exit 0
+# shellcheck source=/dev/null
+source "$config_file"
+
+# Missing session tools mean there is no output this helper can safely remove.
+command -v hyprctl >/dev/null 2>&1 || exit 0
+command -v jq >/dev/null 2>&1 || exit 0
+
+# Check first so repeated disconnect or shutdown cleanup calls remain harmless.
+if hyprctl monitors all -j 2>/dev/null |
+  jq -e --arg output "$TABLET_OUTPUT" '.[] | select(.name == $output)' >/dev/null; then
+  # Remove only the tablet output and tolerate a concurrent Hyprland teardown.
+  hyprctl output remove "$TABLET_OUTPUT" >/dev/null 2>&1 || true
+fi

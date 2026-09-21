@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Creates the headless tablet output when the configured ADB tablet is connected.
+set -u
+
+# Load the host-specific tablet serial and Hyprland output name.
+config_file="${TABLET_DISPLAY_CONFIG:-$HOME/.config/hypr/tablet-display.conf}"
+[[ -r "$config_file" ]] || exit 0
+# shellcheck source=/dev/null
+source "$config_file"
+
+# The helper is optional outside the configured desktop, so missing tools are a no-op.
+command -v adb >/dev/null 2>&1 || exit 0
+command -v hyprctl >/dev/null 2>&1 || exit 0
+command -v jq >/dev/null 2>&1 || exit 0
+
+# Only this authorized tablet is allowed to create the display.
+[[ "$(adb -s "$TABLET_ADB_SERIAL" get-state 2>/dev/null)" == device ]] || exit 0
+
+# Keep repeated startup calls idempotent when the output already exists.
+if hyprctl monitors all -j 2>/dev/null |
+  jq -e --arg output "$TABLET_OUTPUT" '.[] | select(.name == $output)' >/dev/null; then
+  exit 0
+fi
+
+# Create the output, then restart Sunshine after Hyprland has initialized it.
+hyprctl output create headless >/dev/null || exit 0
+sleep 2
+systemctl --user restart app-dev.lizardbyte.app.Sunshine.service || exit 0
+
+# Open the configured Moonlight shortcut on the tablet once its host is ready.
+"$HOME/.config/hypr/scripts/tablet-start-stream"
