@@ -1,0 +1,37 @@
+{
+  "plugin": ["/usr/lib/node_modules/opencode-codex-usage"],
+  "$schema": "https://opencode.ai/config.json",
+
+  // Stop an agentic turn before it can spiral through dozens of model calls.
+  // At the limit, OpenCode asks the model for a text-only status/next-steps reply.
+  "agent": {
+    "build": {
+      "steps": 25
+    },
+    "plan": {
+      "steps": 25
+    },
+    "Guide": {
+      "steps": 25
+    },
+    "general": {
+      "steps": 12
+    },
+    "explore": {
+      "steps": 12
+    }
+  },
+
+  // Keep automatic compaction on, and discard superseded tool output when
+  // building the compacted context. Leave the reserve at OpenCode's default so
+  // small-context models do not begin compacting unnecessarily early.
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 4,
+    "preserve_recent_tokens": 8000
+  },
+  "experimental": {
+    "disable_paste_summary": true
+  }
+}
