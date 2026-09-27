@@ -1,0 +1,33 @@
+# System environment
+
+- Operating system: {{ .chezmoi.osRelease.prettyName }}
+- Distribution ID: {{ .chezmoi.osRelease.id }}
+- Architecture: {{ .chezmoi.arch }}
+- Hostname: {{ .chezmoi.hostname }}
+- Shell: zsh
+- User services are managed with systemd.
+- Dotfiles are managed by chezmoi.
+- Edit managed dotfiles in the chezmoi source directory rather than editing generated files directly.
+- Run `chezmoi apply` after changing the chezmoi source.
+
+{{- if eq .chezmoi.osRelease.id "arch" }}
+
+## Arch Linux
+
+- Use `pacman` for official repository packages and prefer Arch Wiki guidance.
+{{- else if or (eq .chezmoi.osRelease.id "ubuntu") (eq .chezmoi.osRelease.id "debian") }}
+
+## Debian-based Linux
+
+- Use `apt` for system packages.
+{{- else if eq .chezmoi.osRelease.id "fedora" }}
+
+## Fedora Linux
+
+- Use `dnf` for system packages.
+{{- else if eq .chezmoi.osRelease.id "alpine" }}
+
+## Alpine Linux
+
+- Use `apk` for system packages.
+{{- end }}
