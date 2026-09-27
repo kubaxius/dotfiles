@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Rebuild whenever the reviewed shim source changes.
+# {{ include "dot_local/share/steam-hidpi/steam-scale-shim.c" | sha256sum }}
+
+set -eu
+
+source_file="$HOME/.local/share/steam-hidpi/steam-scale-shim.c"
+output_file="$HOME/.local/lib/libsteamscale.so"
+temporary_file="$(mktemp "${TMPDIR:-/tmp}/libsteamscale.XXXXXX.so")"
+trap 'rm -f "$temporary_file"' EXIT HUP INT TERM
+
+if ! command -v cc >/dev/null 2>&1; then
+	printf 'Cannot build Steam scaling shim: a C compiler (cc) is required.\n' >&2
+	exit 1
+fi
+
+mkdir -p "$HOME/.local/lib"
+cc -shared -fPIC -O2 -Wall -Wextra -Werror -Wl,--no-undefined \
+	"$source_file" -ldl -o "$temporary_file"
+install -m 0755 "$temporary_file" "$output_file"
+
+printf 'Built %s\n' "$output_file"

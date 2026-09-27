@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -eu
+
+shim="${STEAM_HIDPI_SHIM_SO:-$HOME/.local/lib/libsteamscale.so}"
+steam_bin="${STEAM_BIN:-/usr/bin/steam}"
+
+if [ ! -r "$shim" ]; then
+	printf 'steam-scaled: missing %s; run chezmoi apply first\n' "$shim" >&2
+	exit 1
+fi
+
+if [ ! -x "$steam_bin" ]; then
+	printf 'steam-scaled: Steam is not executable at %s\n' "$steam_bin" >&2
+	exit 1
+fi
+
+export STEAM_SCALE_FACTOR="${STEAM_SCALE_FACTOR:-1.5}"
+export LD_PRELOAD="$shim${LD_PRELOAD:+:$LD_PRELOAD}"
+
+exec "$steam_bin" "$@"
